@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: {{ url('/sitemap.xml') }}
+
+# Disallow admin areas (when you add them later)
+Disallow: /admin/
+Disallow: /dashboard/
+
+# Allow important pages
+Allow: /
+Allow: /produits
+Allow: /categories
+Allow: /contact
+Allow: /produit/
+Allow: /categorie/

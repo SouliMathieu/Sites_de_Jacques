@@ -1,0 +1,269 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+
+/* Variables CSS personnalisées */
+:root {
+  --vert-energie: #2E8B57;
+  --orange-burkina: #FF8C00;
+  --gris-moderne: #4A5568;
+  --bleu-tech: #3182CE;
+  --gradient-hero: linear-gradient(135deg, #2E8B57 0%, #3182CE 100%);
+  --gradient-cta: linear-gradient(135deg, #FF8C00 0%, #2E8B57 100%);
+}
+
+/* Polices de base */
+body {
+    font-family: 'Open Sans', sans-serif;
+    line-height: 1.6;
+    color: #2D3748;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* Classes de couleurs personnalisées */
+.bg-vert-energie { background-color: var(--vert-energie) !important; }
+.text-vert-energie { color: var(--vert-energie) !important; }
+.border-vert-energie { border-color: var(--vert-energie) !important; }
+
+.bg-orange-burkina { background-color: var(--orange-burkina) !important; }
+.text-orange-burkina { color: var(--orange-burkina) !important; }
+.border-orange-burkina { border-color: var(--orange-burkina) !important; }
+
+.bg-gris-moderne { background-color: var(--gris-moderne) !important; }
+.text-gris-moderne { color: var(--gris-moderne) !important; }
+.border-gris-moderne { border-color: var(--gris-moderne) !important; }
+
+.bg-bleu-tech { background-color: var(--bleu-tech) !important; }
+.text-bleu-tech { color: var(--bleu-tech) !important; }
+.border-bleu-tech { border-color: var(--bleu-tech) !important; }
+
+/* Gradients */
+.bg-gradient-hero { background: var(--gradient-hero) !important; }
+.bg-gradient-cta { background: var(--gradient-cta) !important; }
+
+/* Effets de survol */
+.hover\:bg-vert-energie:hover { background-color: #236B43 !important; }
+.hover\:bg-orange-burkina:hover { background-color: #E67E00 !important; }
+.hover\:bg-bleu-tech:hover { background-color: #2C5282 !important; }
+.hover\:text-vert-energie:hover { color: var(--vert-energie) !important; }
+
+/* Polices personnalisées */
+.font-montserrat { font-family: 'Montserrat', sans-serif !important; }
+.font-roboto { font-family: 'Roboto', sans-serif !important; }
+.font-open-sans { font-family: 'Open Sans', sans-serif !important; }
+
+/* Animations et transitions */
+.transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Boutons stylisés */
+.btn-primary {
+    background: var(--gradient-hero);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(46, 139, 87, 0.3);
+}
+
+.btn-secondary {
+    background: var(--orange-burkina);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #E67E00;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 140, 0, 0.3);
+}
+
+/* Cards avec effet glassmorphism */
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation sticky avec effet glassmorphism */
+.nav-sticky {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid rgba(46, 139, 87, 0.1);
+}
+
+/* Optimisation des images - CORRECTION PRINCIPALE */
+img {
+    object-fit: cover;
+    object-position: center;
+}
+
+.product-image {
+    width: 100%;
+    height: 16rem; /* h-64 = 256px = 16rem */
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.3s ease;
+}
+
+.product-image:hover {
+    transform: scale(1.05);
+}
+
+/* Vidéos dans les cartes produits */
+video {
+    width: 100%;
+    height: 16rem;
+    object-fit: cover;
+    object-position: center;
+    transition: all 0.3s ease;
+}
+
+video:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+/* Logo avec style magnifique */
+.logo-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(46, 139, 87, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+}
+
+.logo-container:hover::before {
+    opacity: 1;
+    animation: shimmer 1.5s ease-in-out;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* Animations d'apparition */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Effet de typing pour les titres */
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+.typing-effect {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 3s steps(40, end);
+}
+
+/* Badges et tags */
+.badge-success {
+    background: rgba(46, 139, 87, 0.1);
+    color: var(--vert-energie);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.badge-warning {
+    background: rgba(255, 140, 0, 0.1);
+    color: var(--orange-burkina);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Responsive design amélioré */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    
+    .btn-primary, .btn-secondary {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    
+    video, .product-image {
+        height: 12rem; /* Plus petit sur mobile */
+    }
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--vert-energie);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #236B43;
+}
