@@ -1,10 +1,10 @@
 @extends('layouts.public')
 
-@section('title', 'Nos Produits - Zida Solaire')
+@section('title', 'Nos Produits - Jackson Energy International')
 @section('description', 'Découvrez notre large gamme de produits solaires et électroniques au Burkina Faso.')
 
 @section('content')
-<div class="bg-gray-100 py-8">
+<div class="bg-gray-100 py-8 header-produits">
     <div class="container mx-auto px-4">
         <nav class="text-sm text-gray-600 mb-4">
             <a href="{{ route('home') }}" class="hover:text-vert-energie">Accueil</a>
@@ -12,28 +12,28 @@
             <span>Produits</span>
         </nav>
 
-        <h1 class="text-3xl md:text-4xl font-montserrat font-bold text-gris-moderne mb-8">
+        <h1 class="text-3xl md:text-4xl font-montserrat font-bold text-gris-moderne mb-8 titre-produits">
             Nos Produits
         </h1>
     </div>
 </div>
 
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 py-8 sidebar-bg">
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Sidebar Filtres -->
         <div class="lg:w-1/4">
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h3 class="font-montserrat font-semibold text-lg mb-4">Catégories</h3>
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6 sidebar-categories">
+                <h3 class="font-montserrat font-semibold text-lg mb-4 sidebar-title">Catégories</h3>
                 <ul class="space-y-2">
                     <li>
-                        <a href="{{ route('products.index') }}" class="flex items-center justify-between text-gray-600 hover:text-vert-energie {{ !request('category') ? 'text-vert-energie font-medium' : '' }}">
+                        <a href="{{ route('products.index') }}" class="flex items-center sidebar-link justify-between text-gray-600 hover:text-vert-energie {{ !request('category') ? 'text-vert-energie font-medium' : '' }}">
                             <span>Tous les produits</span>
                             <span class="text-sm bg-gray-100 px-2 py-1 rounded">{{ $products->total() }}</span>
                         </a>
                     </li>
                     @foreach($categories as $category)
                     <li>
-                        <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="flex items-center justify-between text-gray-600 hover:text-vert-energie {{ request('category') == $category->slug ? 'text-vert-energie font-medium' : '' }}">
+                        <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="flex items-center sidebar-link justify-between text-gray-600 hover:text-vert-energie {{ request('category') == $category->slug ? 'text-vert-energie font-medium' : '' }}">
                             <span>{{ $category->name }}</span>
                             <span class="text-sm bg-gray-100 px-2 py-1 rounded">{{ $category->products_count }}</span>
                         </a>
@@ -77,12 +77,12 @@
             </div>
 
             <!-- Grille des produits -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 section-produits">
                 @forelse($products as $product)
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition group">
-                    <!-- Section image/vidéo corrigée -->
+                    <!-- ✅ Section image/vidéo corrigée pour multiple médias -->
                     <div class="relative">
-                        @if($product->videos && count($product->videos) > 0)
+                        @if($product->hasVideos())
                             <!-- Si le produit a des vidéos, afficher la première vidéo -->
                             <video
                                 class="w-full h-64 object-cover group-hover:scale-105 transition"
@@ -93,26 +93,48 @@
                                 onmouseout="this.pause(); this.currentTime = 0;"
                                 poster="{{ $product->first_image }}"
                             >
-                                <source src="{{ asset($product->videos[0]) }}" type="video/mp4">
+                                <source src="{{ $product->first_video }}" type="video/mp4">
                                 <!-- Fallback vers l'image si la vidéo ne charge pas -->
                                 <img src="{{ $product->first_image }}" alt="{{ $product->name }}" class="w-full h-64 object-cover">
                             </video>
 
-                            <!-- Indicateur vidéo -->
-                            <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded-full text-xs flex items-center">
-                                🎥 Vidéo
+                            <!-- ✅ Indicateurs de médias multiples -->
+                            <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded-full text-xs flex items-center space-x-1">
+                                <span>🎥</span>
+                                <span>{{ $product->videos_count }}</span>
+                                @if($product->hasImages())
+                                    <span>📸{{ $product->images_count }}</span>
+                                @endif
                             </div>
-                        @else
-                            <!-- Si pas de vidéo, afficher l'image normale -->
+                        @elseif($product->hasImages())
+                            <!-- Si pas de vidéo mais des images, afficher la première image -->
                             <img src="{{ $product->first_image }}" alt="{{ $product->name }}" class="w-full h-64 object-cover group-hover:scale-105 transition">
+                            
+                            <!-- Indicateur du nombre d'images -->
+                            @if($product->images_count > 1)
+                                <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded-full text-xs flex items-center space-x-1">
+                                    <span>📸</span>
+                                    <span>{{ $product->images_count }}</span>
+                                </div>
+                            @endif
+                        @else
+                            <!-- Image placeholder si aucun média -->
+                            <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                                <div class="text-center text-gray-500">
+                                    <span class="text-4xl mb-2 block">📷</span>
+                                    <span class="text-sm">Aucune image</span>
+                                </div>
+                            </div>
                         @endif
 
+                        <!-- Badge de promotion -->
                         @if($product->promotional_price)
                         <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                             -{{ round((($product->price - $product->promotional_price) / $product->price) * 100) }}%
                         </div>
                         @endif
 
+                        <!-- Badge de stock -->
                         @if($product->stock_quantity < 10 && $product->stock_quantity > 0)
                         <div class="absolute bottom-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                             Stock limité
@@ -143,7 +165,15 @@
 
                         <!-- Informations supplémentaires -->
                         <div class="flex items-center justify-between mb-4 text-sm text-gray-600">
-                            <span>Stock: {{ $product->stock_quantity }}</span>
+                            <div class="flex items-center space-x-3">
+                                <span>Stock: {{ $product->stock_quantity }}</span>
+                                @if($product->hasImages())
+                                    <span class="text-green-600">📸 {{ $product->images_count }}</span>
+                                @endif
+                                @if($product->hasVideos())
+                                    <span class="text-purple-600">🎥 {{ $product->videos_count }}</span>
+                                @endif
+                            </div>
                             @if($product->warranty)
                             <span>Garantie: {{ $product->warranty }}</span>
                             @endif
@@ -152,16 +182,22 @@
                         <!-- Boutons d'action -->
                         <div class="flex space-x-2">
                             <a href="{{ route('products.show', $product->slug) }}" class="flex-1 bg-vert-energie text-white text-center py-2 rounded-lg hover:bg-green-700 transition font-medium">
-                                @if($product->videos && count($product->videos) > 0)
+                                @if($product->hasVideos())
                                 🎥 Voir vidéo
+                                @elseif($product->hasImages())
+                                📸 Voir images
                                 @else
                                 👁️ Voir détails
                                 @endif
                             </a>
-                            <a href="https://wa.me/22665033700?text=Bonjour, je suis intéressé par {{ $product->name }} - Prix: {{ number_format($product->current_price, 0, ',', ' ') }} FCFA" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                            <a href="https://wa.me/22677126519?text=Bonjour, je suis intéressé par {{ $product->name }} - Prix: {{ number_format($product->current_price, 0, ',', ' ') }} FCFA" 
+                               class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
+                               title="Contacter via WhatsApp">
                                 💬
                             </a>
-                            <a href="{{ route('orders.create', ['product_id' => $product->id]) }}" class="bg-orange-burkina text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+                            <a href="{{ route('orders.create', ['product_id' => $product->id]) }}" 
+                               class="bg-orange-burkina text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
+                               title="Commander ce produit">
                                 🛒
                             </a>
                         </div>
@@ -191,7 +227,7 @@
 
 @push('styles')
 <style>
-/* Amélioration de l'affichage des vidéos */
+/* ✅ Améliorations pour les médias multiples */
 video {
     transition: all 0.3s ease;
 }
@@ -205,11 +241,31 @@ video:hover {
     filter: brightness(1.1);
 }
 
+/* Badge de médias multiples */
+.absolute .flex.items-center.space-x-1 {
+    backdrop-filter: blur(10px);
+}
+
 /* Responsive pour les vidéos */
 @media (max-width: 768px) {
     video {
         height: 200px;
     }
+}
+
+/* Animation pour les badges */
+.absolute.top-2.right-2 {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Amélioration visuelle pour les images placeholder */
+.bg-gray-200 {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
 }
 </style>
 @endpush

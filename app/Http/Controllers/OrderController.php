@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\Customer;
-use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\Customer;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log; // ✅ IMPORT CORRIGÉ
 
 class OrderController extends Controller
 {
@@ -40,9 +41,7 @@ class OrderController extends Controller
 
         // Créer ou récupérer le client
         $customer = Customer::where('phone', $request->customer_phone)->first();
-
         if (!$customer) {
-            // Si pas de client avec ce téléphone, créer un nouveau
             $customer = Customer::create([
                 'name' => $request->customer_name,
                 'phone' => $request->customer_phone,
@@ -53,7 +52,6 @@ class OrderController extends Controller
                 'country' => 'Burkina Faso',
             ]);
         } else {
-            // Si client existe, mettre à jour ses informations
             $customer->update([
                 'name' => $request->customer_name,
                 'email' => $request->customer_email ?: $customer->email,
@@ -83,9 +81,9 @@ class OrderController extends Controller
             $totalAmount += $totalPrice;
         }
 
-        // Créer la commande avec logique de statut améliorée
+        // Créer la commande
         $order = Order::create([
-            'order_number' => 'GO-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
+            'order_number' => 'JE-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
             'customer_id' => $customer->id,
             'total_amount' => $totalAmount,
             'status' => 'pending',
@@ -103,7 +101,6 @@ class OrderController extends Controller
             $order->orderItems()->create($item);
         }
 
-        // Rediriger vers la page de paiement
         return redirect()->route('orders.payment', $order)->with('success', 'Commande créée avec succès !');
     }
 
@@ -120,13 +117,11 @@ class OrderController extends Controller
         ]);
 
         if ($request->payment_at_delivery) {
-            // Le client choisit de payer à la livraison
             $order->update([
                 'payment_status' => 'pending',
                 'status' => 'confirmed',
             ]);
 
-            // Générer l'URL WhatsApp
             $whatsappUrl = $this->generateWhatsAppURL($order, true);
 
             return redirect()->route('orders.success', $order)->with([
@@ -136,7 +131,6 @@ class OrderController extends Controller
             ]);
         }
 
-        // Redirection normale vers la page de paiement
         return redirect()->route('orders.payment', $order);
     }
 
@@ -152,7 +146,6 @@ class OrderController extends Controller
             'status' => 'confirmed',
         ]);
 
-        // Générer l'URL WhatsApp
         $whatsappUrl = $this->generateWhatsAppURL($order);
 
         return redirect()->route('orders.success', $order)->with([
@@ -170,7 +163,7 @@ class OrderController extends Controller
 
     private function generateWhatsAppURL(Order $order, $isPaymentAtDelivery = false)
     {
-        $whatsappNumber = '22665033700'; // Numéro correct avec indicatif pays
+        $whatsappNumber = '22663952032';
 
         if ($isPaymentAtDelivery) {
             $message = $this->generateWhatsAppMessageForDelivery($order);
@@ -178,11 +171,10 @@ class OrderController extends Controller
             $message = $this->generateWhatsAppMessage($order);
         }
 
-        // URL WhatsApp avec le message pré-rempli
         $whatsappUrl = "https://wa.me/{$whatsappNumber}?text=" . $message;
 
-        // Log pour debug
-        \Log::info("URL WhatsApp générée pour commande {$order->order_number}", [
+        // ✅ Le Log fonctionne maintenant
+        Log::info("URL WhatsApp générée pour commande {$order->order_number}", [
             'url' => $whatsappUrl,
             'message' => urldecode($message),
             'phone' => $whatsappNumber
@@ -220,8 +212,8 @@ class OrderController extends Controller
         }
 
         $message .= "💰 *TOTAL:* " . number_format($order->total_amount, 0, ',', ' ') . " FCFA\n\n";
-
         $message .= "💳 *Paiement:* ";
+
         switch ($order->payment_method) {
             case 'orange_money':
                 $message .= "Orange Money ({$order->payment_phone}) - PAYÉ";
@@ -238,7 +230,6 @@ class OrderController extends Controller
         }
 
         $message .= "\n📄 *Référence:* {$order->payment_reference}\n\n";
-
         $message .= "🚚 *LIVRAISON:*\n";
         $message .= "📍 *Adresse:* {$order->delivery_address}\n";
         $message .= "🏙️ *Ville:* {$order->delivery_city}\n";
@@ -251,7 +242,7 @@ class OrderController extends Controller
         $message .= "⏰ *Commandé le:* " . $order->created_at->format('d/m/Y à H:i') . "\n\n";
         $message .= "✅ *Statut:* Confirmée et payée";
 
-        return urlencode($message);
+        return rawurlencode($message); // ✅ Utilise rawurlencode au lieu d'urlencode
     }
 
     private function generateWhatsAppMessageForDelivery(Order $order)
@@ -271,8 +262,8 @@ class OrderController extends Controller
         }
 
         $message .= "💰 *TOTAL À ENCAISSER:* " . number_format($order->total_amount, 0, ',', ' ') . " FCFA\n\n";
-
         $message .= "💳 *Mode de paiement choisi:* ";
+
         switch ($order->payment_method) {
             case 'orange_money':
                 $message .= "Orange Money à la livraison";
@@ -304,6 +295,6 @@ class OrderController extends Controller
         $message .= "⏰ *Commandé le:* " . $order->created_at->format('d/m/Y à H:i') . "\n\n";
         $message .= "⚠️ *Statut:* Confirmée - Paiement à la livraison";
 
-        return urlencode($message);
+        return rawurlencode($message); // ✅ Utilise rawurlencode au lieu d'urlencode
     }
 }
