@@ -1,130 +1,307 @@
 @extends('layouts.public')
+
 @section('title', 'Commande confirmée - ' . $order->order_number)
+
 @section('content')
-
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-4xl mx-auto">
-        <!-- En-tête avec message adaptatif -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-4">
-                Merci {{ $order->customer->name }} pour votre commande
+{{-- Hero Header Success --}}
+<div class="bg-gradient-to-r from-green-500 to-emerald-600 py-16">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            {{-- Animation checkmark --}}
+            <div class="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full mb-6 animate-bounce">
+                <span class="text-6xl">✅</span>
+            </div>
+            
+            <h1 class="text-4xl font-montserrat font-bold text-white mb-4">
+                Merci {{ $order->customer_name }} !
             </h1>
+            <p class="text-xl text-green-100 mb-6">
+                Votre commande a été confirmée avec succès
+            </p>
+            <div class="inline-block bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3">
+                <p class="text-sm text-green-100 mb-1">Numéro de commande</p>
+                <p class="text-2xl font-mono font-bold text-white">{{ $order->order_number }}</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-            <!-- Message adaptatif selon le mode de paiement -->
-            @if($order->payment_method === 'cash')
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                    <div class="flex items-center justify-center">
-                        <div class="text-4xl mr-3">💰</div>
-                        <div>
-                            <h3 class="font-semibold text-yellow-800">Paiement en espèces à la livraison</h3>
-                            <p class="text-sm text-yellow-700">
-                                Préparez le montant exact : <strong>{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</strong><br>
-                                Notre livreur vous contactera avant la livraison.
+{{-- Message adaptatif selon le mode de paiement --}}
+<div class="container mx-auto px-4 -mt-8">
+    <div class="max-w-4xl mx-auto">
+        @if($order->payment_method === 'cash_on_delivery')
+            {{-- Espèces à la livraison --}}
+            <div class="bg-white rounded-xl shadow-2xl p-8 mb-8 border-l-4 border-yellow-500">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-3xl mr-6">
+                        💰
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Paiement en espèces à la livraison</h3>
+                        <div class="bg-yellow-50 rounded-lg p-4 mb-4">
+                            <p class="text-yellow-900 font-semibold text-lg mb-2">
+                                💵 Montant à préparer : <span class="text-2xl font-bold">{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span>
+                            </p>
+                            <p class="text-yellow-800 text-sm">
+                                Merci de préparer le montant exact si possible
                             </p>
                         </div>
+                        <ul class="space-y-2 text-gray-700">
+                            <li class="flex items-start">
+                                <span class="text-green-600 mr-2">✓</span>
+                                <span>Notre livreur vous contactera avant la livraison</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-600 mr-2">✓</span>
+                                <span>Vous recevrez un reçu officiel après paiement</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-600 mr-2">✓</span>
+                                <span>Vous pouvez aussi payer par Mobile Money à la livraison</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-            @elseif($order->payment_method === 'orange_money')
-                @if($order->payment_status === 'paid')
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                        <div class="flex items-center justify-center">
-                            <div class="text-4xl mr-3">✅</div>
-                            <div>
-                                <h3 class="font-semibold text-green-800">Paiement Orange Money confirmé</h3>
-                                <p class="text-sm text-green-700">
-                                    Votre paiement de {{ number_format($order->total_amount, 0, ',', ' ') }} FCFA a été reçu avec succès.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-                        <div class="flex items-center justify-center">
-                            <div class="text-4xl mr-3">📱</div>
-                            <div>
-                                <h3 class="font-semibold text-orange-800">Paiement Orange Money à la livraison</h3>
-                                <p class="text-sm text-orange-700">
-                                    Préparez votre téléphone Orange Money pour payer <strong>{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</strong><br>
-                                    Notre livreur vous assistera pour la transaction.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            @elseif($order->payment_method === 'moov_money')
-                @if($order->payment_status === 'paid')
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                        <div class="flex items-center justify-center">
-                            <div class="text-4xl mr-3">✅</div>
-                            <div>
-                                <h3 class="font-semibold text-green-800">Paiement Moov Money confirmé</h3>
-                                <p class="text-sm text-green-700">
-                                    Votre paiement de {{ number_format($order->total_amount, 0, ',', ' ') }} FCFA a été reçu avec succès.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                        <div class="flex items-center justify-center">
-                            <div class="text-4xl mr-3">📱</div>
-                            <div>
-                                <h3 class="font-semibold text-blue-800">Paiement Moov Money à la livraison</h3>
-                                <p class="text-sm text-blue-700">
-                                    Préparez votre téléphone Moov Money pour payer <strong>{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</strong><br>
-                                    Notre livreur vous assistera pour la transaction.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            @elseif($order->payment_method === 'bank_transfer')
-                @if($order->payment_status === 'paid')
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                        <div class="flex items-center justify-center">
-                            <div class="text-4xl mr-3">✅</div>
-                            <div>
-                                <h3 class="font-semibold text-green-800">Virement bancaire confirmé</h3>
-                                <p class="text-sm text-green-700">
-                                    Votre virement de {{ number_format($order->total_amount, 0, ',', ' ') }} FCFA a été reçu et vérifié.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
-                        <div class="flex items-center justify-center">
-                            <div class="text-4xl mr-3">🏦</div>
-                            <div>
-                                <h3 class="font-semibold text-purple-800">En attente de virement bancaire</h3>
-                                <p class="text-sm text-purple-700">
-                                    Effectuez le virement de <strong>{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</strong> selon les instructions<br>
-                                    ou payez à la livraison selon votre préférence.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            @endif
-        </div>
+            </div>
 
-        <!-- Détails de la commande -->
-        <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Numéro de commande</h3>
-                    <p class="text-xl font-mono text-green-600">{{ $order->order_number }}</p>
+        @elseif($order->payment_method === 'orange_money')
+            @if($order->payment_status === 'paid')
+                {{-- Orange Money payé --}}
+                <div class="bg-white rounded-xl shadow-2xl p-8 mb-8 border-l-4 border-green-500">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-3xl mr-6">
+                            ✅
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3">Paiement Orange Money confirmé</h3>
+                            <div class="bg-green-50 rounded-lg p-4 mb-4">
+                                <p class="text-green-900 font-semibold text-lg">
+                                    ✅ Paiement de <span class="text-xl font-bold">{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span> reçu avec succès
+                                </p>
+                            </div>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Votre commande est en cours de préparation</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Vous recevrez une notification lors de l'expédition</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Notre livreur vous contactera avant la livraison</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Date</h3>
-                    <p class="text-gray-700">{{ $order->created_at->format('d/m/Y à H:i') }}</p>
+            @else
+                {{-- Orange Money à la livraison --}}
+                <div class="bg-white rounded-xl shadow-2xl p-8 mb-8 border-l-4 border-orange-500">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-3xl mr-6">
+                            📱
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3">Paiement Orange Money à la livraison</h3>
+                            <div class="bg-orange-50 rounded-lg p-4 mb-4">
+                                <p class="text-orange-900 font-semibold text-lg mb-2">
+                                    📱 Montant à payer : <span class="text-2xl font-bold">{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span>
+                                </p>
+                                <p class="text-orange-800 text-sm">
+                                    Préparez votre téléphone Orange Money
+                                </p>
+                            </div>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Notre livreur vous assistera pour la transaction Orange Money</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Assurez-vous que votre compte est approvisionné</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Vous pouvez aussi payer en espèces si vous préférez</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Montant total</h3>
-                    <p class="text-xl font-bold text-gray-900">{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</p>
+            @endif
+
+        @elseif($order->payment_method === 'moov_money')
+            @if($order->payment_status === 'paid')
+                {{-- Moov Money payé --}}
+                <div class="bg-white rounded-xl shadow-2xl p-8 mb-8 border-l-4 border-green-500">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-3xl mr-6">
+                            ✅
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3">Paiement Moov Money confirmé</h3>
+                            <div class="bg-green-50 rounded-lg p-4 mb-4">
+                                <p class="text-green-900 font-semibold text-lg">
+                                    ✅ Paiement de <span class="text-xl font-bold">{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span> reçu avec succès
+                                </p>
+                            </div>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Votre commande est en cours de préparation</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Vous recevrez une notification lors de l'expédition</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Notre livreur vous contactera avant la livraison</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Statut de la commande</h3>
+            @else
+                {{-- Moov Money à la livraison --}}
+                <div class="bg-white rounded-xl shadow-2xl p-8 mb-8 border-l-4 border-blue-500">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-3xl mr-6">
+                            📱
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3">Paiement Moov Money à la livraison</h3>
+                            <div class="bg-blue-50 rounded-lg p-4 mb-4">
+                                <p class="text-blue-900 font-semibold text-lg mb-2">
+                                    📱 Montant à payer : <span class="text-2xl font-bold">{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span>
+                                </p>
+                                <p class="text-blue-800 text-sm">
+                                    Préparez votre téléphone Moov Money
+                                </p>
+                            </div>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Notre livreur vous assistera pour la transaction Moov Money</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Assurez-vous que votre compte est approvisionné</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Vous pouvez aussi payer en espèces si vous préférez</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+        @elseif($order->payment_method === 'bank_transfer')
+            @if($order->payment_status === 'paid')
+                {{-- Virement payé --}}
+                <div class="bg-white rounded-xl shadow-2xl p-8 mb-8 border-l-4 border-green-500">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-3xl mr-6">
+                            ✅
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3">Virement bancaire confirmé</h3>
+                            <div class="bg-green-50 rounded-lg p-4 mb-4">
+                                <p class="text-green-900 font-semibold text-lg">
+                                    ✅ Virement de <span class="text-xl font-bold">{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span> reçu et vérifié
+                                </p>
+                            </div>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Votre paiement a été validé par notre service comptabilité</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Votre commande est en cours de préparation</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-600 mr-2">✓</span>
+                                    <span>Vous recevrez une notification lors de l'expédition</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @else
+                {{-- Virement en attente --}}
+                <div class="bg-white rounded-xl shadow-2xl p-8 mb-8 border-l-4 border-purple-500">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-3xl mr-6">
+                            🏦
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3">En attente de virement bancaire</h3>
+                            <div class="bg-purple-50 rounded-lg p-4 mb-4">
+                                <p class="text-purple-900 font-semibold text-lg mb-2">
+                                    🏦 Montant à virer : <span class="text-2xl font-bold">{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span>
+                                </p>
+                                <p class="text-purple-800 text-sm">
+                                    Effectuez le virement selon les instructions reçues
+                                </p>
+                            </div>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-purple-600 mr-2">→</span>
+                                    <span>Effectuez le virement vers le compte <strong>410730007217 (UBA)</strong></span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-purple-600 mr-2">→</span>
+                                    <span>Envoyez-nous le reçu par WhatsApp ou email</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-purple-600 mr-2">→</span>
+                                    <span>Ou payez à la livraison selon votre préférence</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endif
+    </div>
+</div>
+
+{{-- Détails de la commande --}}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            {{-- Récapitulatif --}}
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="text-2xl mr-2">📋</span> Récapitulatif
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Numéro de commande</p>
+                        <p class="text-xl font-mono font-bold text-green-600">{{ $order->order_number }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Date de commande</p>
+                        <p class="text-gray-900 font-semibold">{{ $order->created_at->format('d/m/Y à H:i') }}</p>
+                    </div>
+                    <div class="pt-4 border-t">
+                        <p class="text-sm text-gray-600 mb-1">Montant total</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ number_format($order->total_amount, 0, ',', ' ') }} <span class="text-lg">FCFA</span></p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Statut --}}
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="text-2xl mr-2">📊</span> Statut
+                </h3>
+                <div class="space-y-4">
                     @php
                         $statusText = '';
                         $statusColor = '';
@@ -132,48 +309,75 @@
 
                         if ($order->payment_status === 'paid') {
                             $statusText = 'Confirmée et payée';
-                            $statusColor = 'bg-green-100 text-green-800';
+                            $statusColor = 'bg-green-100 text-green-800 border-green-300';
                             $statusIcon = '✅';
-                        } elseif ($order->payment_method === 'cash') {
+                        } elseif ($order->payment_method === 'cash_on_delivery') {
                             $statusText = 'Confirmée - Paiement espèces à la livraison';
-                            $statusColor = 'bg-yellow-100 text-yellow-800';
+                            $statusColor = 'bg-yellow-100 text-yellow-800 border-yellow-300';
                             $statusIcon = '💰';
                         } elseif ($order->payment_method === 'orange_money') {
                             $statusText = 'Confirmée - Orange Money à la livraison';
-                            $statusColor = 'bg-orange-100 text-orange-800';
+                            $statusColor = 'bg-orange-100 text-orange-800 border-orange-300';
                             $statusIcon = '📱';
                         } elseif ($order->payment_method === 'moov_money') {
                             $statusText = 'Confirmée - Moov Money à la livraison';
-                            $statusColor = 'bg-blue-100 text-blue-800';
+                            $statusColor = 'bg-blue-100 text-blue-800 border-blue-300';
                             $statusIcon = '📱';
                         } elseif ($order->payment_method === 'bank_transfer') {
                             $statusText = 'Confirmée - En attente de virement';
-                            $statusColor = 'bg-purple-100 text-purple-800';
+                            $statusColor = 'bg-purple-100 text-purple-800 border-purple-300';
                             $statusIcon = '🏦';
                         }
                     @endphp
 
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $statusColor }}">
-                        {{ $statusIcon }} {{ $statusText }}
-                    </span>
+                    <div class="border-2 {{ $statusColor }} rounded-lg p-4 text-center">
+                        <span class="text-3xl block mb-2">{{ $statusIcon }}</span>
+                        <p class="font-bold">{{ $statusText }}</p>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Commande reçue</span>
+                            <span class="text-green-600 font-bold">✓</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Paiement {{ $order->payment_status === 'paid' ? 'reçu' : 'en attente' }}</span>
+                            <span class="{{ $order->payment_status === 'paid' ? 'text-green-600' : 'text-yellow-600' }} font-bold">{{ $order->payment_status === 'paid' ? '✓' : '⏳' }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Préparation en cours</span>
+                            <span class="text-gray-400 font-bold">○</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Livraison</span>
+                            <span class="text-gray-400 font-bold">○</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Articles commandés -->
-        <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Articles commandés</h3>
+        {{-- Articles commandés --}}
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                <span class="text-2xl mr-2">🛍️</span> Articles commandés ({{ $order->orderItems->count() }})
+            </h3>
             <div class="space-y-4">
                 @foreach($order->orderItems as $item)
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
-                    <div class="flex-1">
-                        <h4 class="font-medium text-gray-900">{{ $item->product->name }}</h4>
-                        <p class="text-sm text-gray-600">
-                            {{ $item->quantity }} × {{ number_format($item->unit_price, 0, ',', ' ') }} FCFA
-                        </p>
+                <div class="flex items-center justify-between py-4 border-b border-gray-200 last:border-b-0">
+                    <div class="flex items-center flex-1">
+                        <img src="{{ $item->product->first_image ?? '/images/placeholder.jpg' }}" 
+                             alt="{{ $item->product_name }}" 
+                             class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200 mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-900">{{ $item->product_name }}</h4>
+                            <p class="text-sm text-gray-600">
+                                {{ $item->quantity }} × {{ number_format($item->unit_price, 0, ',', ' ') }} FCFA
+                            </p>
+                        </div>
                     </div>
                     <div class="text-right">
-                        <p class="font-semibold text-gray-900">
+                        <p class="text-lg font-bold text-gray-900">
                             {{ number_format($item->total_price, 0, ',', ' ') }} FCFA
                         </p>
                     </div>
@@ -182,65 +386,104 @@
             </div>
         </div>
 
-        <!-- Informations de livraison -->
-        <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Informations de livraison</h3>
-            <div class="space-y-2">
-                <p><strong>Adresse :</strong> {{ $order->delivery_address }}</p>
-                <p><strong>Ville :</strong> {{ $order->delivery_city }}</p>
-                <p><strong>Téléphone :</strong> {{ $order->delivery_phone }}</p>
+        {{-- Informations de livraison --}}
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                <span class="text-2xl mr-2">🚚</span> Informations de livraison
+            </h3>
+            <div class="bg-gray-50 rounded-lg p-6 space-y-3">
+                <div class="flex items-start">
+                    <span class="text-gray-600 font-semibold w-32">📍 Adresse :</span>
+                    <span class="text-gray-900">{{ $order->delivery_address }}</span>
+                </div>
+                <div class="flex items-start">
+                    <span class="text-gray-600 font-semibold w-32">🏙️ Ville :</span>
+                    <span class="text-gray-900">{{ $order->delivery_city }}</span>
+                </div>
+                <div class="flex items-start">
+                    <span class="text-gray-600 font-semibold w-32">📞 Téléphone :</span>
+                    <span class="text-gray-900">{{ $order->delivery_phone }}</span>
+                </div>
             </div>
         </div>
 
-        <!-- Boutons d'action -->
-        <div class="text-center">
+        {{-- Boutons d'action --}}
+        <div class="text-center mb-8">
             <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                 <a href="{{ route('home') }}"
-                   class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300">
-                    Continuer mes achats
+                   class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold text-lg rounded-lg shadow-md hover:shadow-xl transition-all transform hover:scale-105">
+                    <span class="mr-2">🛍️</span> Continuer mes achats
                 </a>
 
                 @if($order->payment_status === 'pending' && $order->payment_method === 'bank_transfer')
-                <a href="mailto:contact@grossiste-ouaga.com?subject=Commande {{ $order->order_number }}"
-                   class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300">
-                    Envoyer justificatif de paiement
+                <a href="mailto:contact@jacksonenergy.com?subject=Commande {{ $order->order_number }}&body=Bonjour,%0D%0A%0D%0AJe vous envoie le justificatif de paiement pour ma commande {{ $order->order_number }}.%0D%0A%0D%0AMontant: {{ number_format($order->total_amount, 0, ',', ' ') }} FCFA"
+                   class="inline-flex items-center justify-center px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-lg rounded-lg shadow-md hover:shadow-xl transition-all">
+                    <span class="mr-2">📧</span> Envoyer justificatif
                 </a>
                 @endif
             </div>
 
-            <p class="text-gray-600 mb-4">
-                Pour toute question, contactez-nous au
-                <a href="tel:+22665033700" class="text-green-600 font-semibold hover:text-green-700">
-                    +226 65033700
-                </a>
-                ou via WhatsApp
-            </p>
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+                <p class="text-gray-700 mb-3 font-semibold">💬 Besoin d'aide ou d'informations ?</p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="tel:+22665033700" 
+                       class="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-blue-50 border-2 border-blue-300 text-blue-700 font-bold rounded-lg transition">
+                        <span class="mr-2">📞</span> +226 65 03 37 00
+                    </a>
+                    <a href="https://wa.me/22665033700?text=Bonjour, j'ai une question concernant ma commande {{ $order->order_number }}" 
+                       target="_blank"
+                       class="inline-flex items-center justify-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg shadow-md transition">
+                        <span class="mr-2">💬</span> WhatsApp
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-@if(session('open_whatsapp') && session('whatsapp_url'))
-<script>
-    // Ouvrir WhatsApp automatiquement après 1 seconde
-    setTimeout(function() {
-        window.location.href = '{{ session("whatsapp_url") }}';
-    }, 1000);
-</script>
 
-<!-- Message informatif pour l'utilisateur -->
-<div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-    <div class="text-4xl mb-2">📱</div>
-    <h3 class="text-lg font-semibold text-green-800 mb-2">WhatsApp va s'ouvrir automatiquement</h3>
-    <p class="text-sm text-green-700 mb-3">
-        L'application WhatsApp va s'ouvrir avec un message pré-rempli.
-        Il vous suffira de cliquer sur "Envoyer" pour nous notifier.
-    </p>
-    <p class="text-xs text-green-600">
-        Si WhatsApp ne s'ouvre pas automatiquement,
-        <a href="{{ session('whatsapp_url') }}" target="_blank" class="underline font-semibold">
-            cliquez ici
-        </a>
-    </p>
+{{-- WhatsApp auto-open --}}
+@if(session('open_whatsapp') && session('whatsapp_url'))
+<div class="fixed bottom-6 right-6 z-50 animate-bounce">
+    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm border-2 border-green-500">
+        <div class="text-center">
+            <div class="text-5xl mb-3">📱</div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">WhatsApp va s'ouvrir</h3>
+            <p class="text-sm text-gray-600 mb-4">
+                L'application va s'ouvrir avec un message pré-rempli. Cliquez sur "Envoyer" pour nous notifier.
+            </p>
+            <a href="{{ session('whatsapp_url') }}" 
+               target="_blank"
+               class="inline-flex items-center justify-center w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition">
+                <span class="mr-2">💬</span> Ouvrir WhatsApp
+            </a>
+        </div>
+    </div>
 </div>
+
+<script>
+setTimeout(function() {
+    window.open('{{ session("whatsapp_url") }}', '_blank');
+}, 1500);
+</script>
 @endif
+
+@push('styles')
+<style>
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+.animate-bounce {
+    animation: bounce 1s infinite;
+}
+</style>
+@endpush
 
 @endsection

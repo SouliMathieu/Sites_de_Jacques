@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Administration - Grossiste Ouaga International')</title>
+    <title>@yield('title', 'Administration - Jackson Energy International')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- CSS Dropzone LOCAL -->
@@ -17,16 +17,16 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center">
-                        <div class="w-8 h-8 bg-vert-energie rounded-lg flex items-center justify-center text-white font-bold">GO</div>
-                        <span class="ml-2 font-montserrat font-bold text-lg">Administration</span>
+                        <div class="w-8 h-8 bg-gradient-to-br from-green-600 to-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">JE</div>
+                        <span class="ml-2 font-montserrat font-bold text-lg text-gray-900">Jackson Energy</span>
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('home') }}" class="text-gray-600 hover:text-vert-energie" target="_blank">🌐 Voir le site</a>
-                    <span class="text-gray-600">{{ auth()->user()->name ?? 'Admin' }}</span>
+                    <a href="{{ route('home') }}" class="text-gray-600 hover:text-green-600 transition-colors" target="_blank" title="Voir le site public">🌐 Voir le site</a>
+                    <span class="text-gray-600 text-sm">{{ auth()->user()->name ?? 'Admin' }}</span>
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
-                        <button type="submit" class="text-red-600 hover:text-red-800">Déconnexion</button>
+                        <button type="submit" class="text-red-600 hover:text-red-800 transition-colors text-sm font-medium">🚪 Déconnexion</button>
                     </form>
                 </div>
             </div>
@@ -35,81 +35,87 @@
 
     <div class="flex">
         <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-sm min-h-screen">
-            <nav class="mt-8">
+        <div class="w-64 bg-white shadow-sm min-h-screen border-r">
+            <nav class="mt-6">
                 <div class="px-4 space-y-2">
                     {{-- Menu principal --}}
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 {{ request()->routeIs('admin.dashboard') ? 'bg-vert-energie text-white' : '' }}">
-                        📊 Tableau de bord
-                    </a>
-                    <a href="{{ route('admin.categories.index') }}" class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 {{ request()->routeIs('admin.categories.*') ? 'bg-vert-energie text-white' : '' }}">
-                        📁 Catégories
-                    </a>
-                    <a href="{{ route('admin.products.index') }}" class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 {{ request()->routeIs('admin.products.*') ? 'bg-vert-energie text-white' : '' }}">
-                        📦 Produits
-                    </a>
-                    <a href="{{ route('admin.orders.index') }}" class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 {{ request()->routeIs('admin.orders.*') ? 'bg-vert-energie text-white' : '' }}">
-                        📋 Commandes
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md' : '' }}">
+                        <span class="text-lg mr-3">📊</span>
+                        <span class="font-medium">Tableau de bord</span>
                     </a>
 
-                    {{-- ✅ NOUVEAU : Section Publicité --}}
-                    <a href="{{ route('admin.ad-campaigns.index') }}" class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 {{ request()->routeIs('admin.ad-campaigns.*') ? 'bg-vert-energie text-white' : '' }}">
-                        📢 Campagnes publicitaires
+                    <a href="{{ route('admin.categories.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md' : '' }}">
+                        <span class="text-lg mr-3">📁</span>
+                        <span class="font-medium">Catégories</span>
+                    </a>
+
+                    <a href="{{ route('admin.products.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.products.*') ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md' : '' }}">
+                        <span class="text-lg mr-3">📦</span>
+                        <span class="font-medium">Produits</span>
+                    </a>
+
+                    <a href="{{ route('admin.orders.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.orders.*') ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md' : '' }}">
+                        <span class="text-lg mr-3">📋</span>
+                        <span class="font-medium">Commandes</span>
                     </a>
 
                     {{-- Séparateur visuel --}}
                     <div class="border-t border-gray-200 my-4"></div>
 
-                    {{-- ✅ NOUVEAU : Liens externes --}}
+                    {{-- Liens externes --}}
                     <div class="px-4 py-2">
                         <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Plateformes externes</h4>
                     </div>
 
-                    <a href="https://business.facebook.com/adsmanager/" target="_blank"
-                       class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
-                        <span class="flex-1">🎯 Meta Business Manager</span>
+                    <a href="https://business.facebook.com/adsmanager/" target="_blank" rel="noopener noreferrer"
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors group">
+                        <span class="text-lg mr-3">🎯</span>
+                        <span class="flex-1 font-medium">Meta Business</span>
                         <span class="text-xs text-gray-400 group-hover:text-gray-600 transition-colors">↗</span>
                     </a>
 
-                    <a href="https://ads.google.com/" target="_blank"
-                       class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
-                        <span class="flex-1">🌐 Google Ads</span>
+                    <a href="https://ads.google.com/" target="_blank" rel="noopener noreferrer"
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors group">
+                        <span class="text-lg mr-3">🌐</span>
+                        <span class="flex-1 font-medium">Google Ads</span>
                         <span class="text-xs text-gray-400 group-hover:text-gray-600 transition-colors">↗</span>
                     </a>
 
                     {{-- Séparateur visuel --}}
                     <div class="border-t border-gray-200 my-4"></div>
 
-                    {{-- ✅ NOUVEAU : Liens utiles --}}
+                    {{-- Liens utiles --}}
                     <div class="px-4 py-2">
                         <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Outils</h4>
                     </div>
 
-                    <a href="https://analytics.google.com/" target="_blank"
-                       class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
-                        <span class="flex-1">📈 Google Analytics</span>
+                    <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer"
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors group">
+                        <span class="text-lg mr-3">📈</span>
+                        <span class="flex-1 font-medium">Google Analytics</span>
                         <span class="text-xs text-gray-400 group-hover:text-gray-600 transition-colors">↗</span>
                     </a>
 
-                    <a href="https://search.google.com/search-console/" target="_blank"
-                       class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
-                        <span class="flex-1">🔍 Search Console</span>
+                    <a href="https://search.google.com/search-console/" target="_blank" rel="noopener noreferrer"
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors group">
+                        <span class="text-lg mr-3">🔍</span>
+                        <span class="flex-1 font-medium">Search Console</span>
                         <span class="text-xs text-gray-400 group-hover:text-gray-600 transition-colors">↗</span>
                     </a>
                 </div>
 
-                {{-- ✅ NOUVEAU : Footer du sidebar avec info --}}
+                {{-- Footer du sidebar avec info --}}
                 <div class="px-4 py-4 mt-8 border-t border-gray-200">
                     <div class="text-center">
-                        <div class="text-xs text-gray-500 mb-2">Publicité en attente d'API</div>
-                        <div class="text-xs text-gray-400">
-                            <div class="flex items-center justify-center space-x-2">
-                                <span class="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                                <span>Meta: En attente de vérification</span>
+                        <div class="text-xs text-gray-500 mb-3 font-medium">État des APIs</div>
+                        <div class="text-xs space-y-2">
+                            <div class="flex items-center justify-center space-x-2 p-2 bg-yellow-50 rounded-lg">
+                                <span class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
+                                <span class="text-gray-600">Meta: En attente</span>
                             </div>
-                            <div class="flex items-center justify-center space-x-2 mt-1">
+                            <div class="flex items-center justify-center space-x-2 p-2 bg-red-50 rounded-lg">
                                 <span class="w-2 h-2 bg-red-400 rounded-full"></span>
-                                <span>Google: Non éligible</span>
+                                <span class="text-gray-600">Google: Non éligible</span>
                             </div>
                         </div>
                     </div>
@@ -118,51 +124,68 @@
         </div>
 
         <!-- Contenu principal -->
-        <div class="flex-1 p-8">
+        <div class="flex-1">
             {{-- Messages de session --}}
             @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center">
-                <span class="text-green-600 mr-2">✅</span>
-                {{ session('success') }}
+            <div class="m-6 p-4 bg-green-50 border border-green-300 text-green-800 rounded-lg shadow-sm flex items-start space-x-3 animate-slideInDown">
+                <span class="text-lg mt-0.5">✅</span>
+                <div class="flex-1">
+                    <p class="font-medium">Succès</p>
+                    <p class="text-sm text-green-700">{{ session('success') }}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-green-600 hover:text-green-800">&times;</button>
             </div>
             @endif
 
             @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 flex items-center">
-                <span class="text-red-600 mr-2">❌</span>
-                {{ session('error') }}
+            <div class="m-6 p-4 bg-red-50 border border-red-300 text-red-800 rounded-lg shadow-sm flex items-start space-x-3 animate-slideInDown">
+                <span class="text-lg mt-0.5">❌</span>
+                <div class="flex-1">
+                    <p class="font-medium">Erreur</p>
+                    <p class="text-sm text-red-700">{{ session('error') }}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-red-600 hover:text-red-800">&times;</button>
             </div>
             @endif
 
             @if(session('warning'))
-            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6 flex items-center">
-                <span class="text-yellow-600 mr-2">⚠️</span>
-                {{ session('warning') }}
+            <div class="m-6 p-4 bg-yellow-50 border border-yellow-300 text-yellow-800 rounded-lg shadow-sm flex items-start space-x-3 animate-slideInDown">
+                <span class="text-lg mt-0.5">⚠️</span>
+                <div class="flex-1">
+                    <p class="font-medium">Attention</p>
+                    <p class="text-sm text-yellow-700">{{ session('warning') }}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-yellow-600 hover:text-yellow-800">&times;</button>
             </div>
             @endif
 
             @if(session('info'))
-            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6 flex items-center">
-                <span class="text-blue-600 mr-2">ℹ️</span>
-                {{ session('info') }}
+            <div class="m-6 p-4 bg-blue-50 border border-blue-300 text-blue-800 rounded-lg shadow-sm flex items-start space-x-3 animate-slideInDown">
+                <span class="text-lg mt-0.5">ℹ️</span>
+                <div class="flex-1">
+                    <p class="font-medium">Information</p>
+                    <p class="text-sm text-blue-700">{{ session('info') }}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-blue-600 hover:text-blue-800">&times;</button>
             </div>
             @endif
 
-            @yield('content')
+            {{-- Contenu --}}
+            <div class="p-8">
+                @yield('content')
+            </div>
         </div>
     </div>
 
-    <!-- JS Dropzone SIMPLE LOCAL -->
+    <!-- JS Dropzone LOCAL -->
     <script src="{{ asset('assets/js/dropzone-simple.js') }}"></script>
     <script>
         console.log('✅ SimpleDropzone chargé avec succès');
 
-        // ✅ NOUVEAU : Script pour les liens externes
         document.addEventListener('DOMContentLoaded', function() {
             // Ajouter une confirmation pour les liens externes
             const externalLinks = document.querySelectorAll('a[target="_blank"]');
             externalLinks.forEach(link => {
-                // Ajouter un indicateur visuel au survol
                 link.addEventListener('mouseenter', function() {
                     this.title = this.title || 'Lien externe - S\'ouvre dans un nouvel onglet';
                 });
@@ -171,12 +194,14 @@
             // Fonction utilitaire pour afficher des notifications
             window.showAdminNotification = function(message, type = 'info') {
                 const notification = document.createElement('div');
-                notification.className = `fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 ${
-                    type === 'success' ? 'bg-green-100 text-green-700 border border-green-400' :
-                    type === 'error' ? 'bg-red-100 text-red-700 border border-red-400' :
-                    type === 'warning' ? 'bg-yellow-100 text-yellow-700 border border-yellow-400' :
-                    'bg-blue-100 text-blue-700 border border-blue-400'
-                }`;
+                const bgClass = {
+                    'success': 'bg-green-50 border border-green-300 text-green-800',
+                    'error': 'bg-red-50 border border-red-300 text-red-800',
+                    'warning': 'bg-yellow-50 border border-yellow-300 text-yellow-800',
+                    'info': 'bg-blue-50 border border-blue-300 text-blue-800'
+                }[type] || 'bg-blue-50 border border-blue-300 text-blue-800';
+
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 max-w-sm animate-slideInDown ${bgClass}`;
 
                 const icon = {
                     'success': '✅',
@@ -186,10 +211,12 @@
                 }[type] || 'ℹ️';
 
                 notification.innerHTML = `
-                    <div class="flex items-center">
-                        <span class="mr-2">${icon}</span>
-                        <span>${message}</span>
-                        <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-lg">&times;</button>
+                    <div class="flex items-start space-x-3">
+                        <span class="text-lg">${icon}</span>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium">${message}</p>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="text-lg leading-none">&times;</button>
                     </div>
                 `;
 
@@ -198,10 +225,58 @@
                 // Auto-remove après 5 secondes
                 setTimeout(() => {
                     if (notification.parentNode) {
-                        notification.remove();
+                        notification.style.animation = 'slideOutUp 0.3s ease-out forwards';
+                        setTimeout(() => notification.remove(), 300);
                     }
                 }, 5000);
             };
+
+            // Ajouter l'animation CSS si elle n'existe pas
+            if (!document.querySelector('style[data-admin-animations]')) {
+                const style = document.createElement('style');
+                style.setAttribute('data-admin-animations', 'true');
+                style.innerHTML = `
+                    @keyframes slideInDown {
+                        from {
+                            opacity: 0;
+                            transform: translateY(-20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    @keyframes slideOutUp {
+                        from {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: translateY(-20px);
+                        }
+                    }
+
+                    .animate-slideInDown {
+                        animation: slideInDown 0.3s ease-out;
+                    }
+
+                    .animate-pulse {
+                        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                    }
+
+                    @keyframes pulse {
+                        0%, 100% {
+                            opacity: 1;
+                        }
+                        50% {
+                            opacity: .5;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
         });
     </script>
 

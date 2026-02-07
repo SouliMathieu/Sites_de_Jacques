@@ -1,129 +1,188 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Modifier le produit - Administration')
+@section('title', 'Modifier le produit - Jackson Energy International')
 
 @section('content')
-<div class="admin-form-bf">
+<div class="max-w-5xl mx-auto">
     <div class="mb-8">
-        <h1 class="text-3xl font-montserrat font-bold text-gray-900">Modifier le produit</h1>
-        <p class="text-gray-600">Modifiez les informations du produit "{{ $product->name }}"</p>
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-montserrat font-bold text-gray-900">✏️ Modifier le produit</h1>
+                <p class="text-gray-600 mt-1">Modifiez les informations de <span class="font-semibold text-green-600">"{{ $product->name }}"</span></p>
+            </div>
+            <a href="{{ route('admin.products.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
+                ← Retour à la liste
+            </a>
+        </div>
     </div>
 
-    @if(session('success'))
-        <div class="admin-message-success mb-6">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="admin-message-error mb-6">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <div class="bg-white rounded-lg shadow">
-        <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data" class="p-6 space-y-6">
+    <div class="bg-white rounded-lg shadow-lg">
+        <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data" class="p-8 space-y-8">
             @csrf
             @method('PUT')
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="name" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Nom du produit *</label>
-                    <input type="text" id="name" name="name" value="{{ old('name', $product->name) }}" required
-                        class="w-full admin-input-bf px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie @error('name') border-red-500 @enderror">
-                    @error('name')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            {{-- Informations de base --}}
+            <div class="border-b pb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">1</span>
+                    Informations de base
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Nom du produit <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="name" name="name" value="{{ old('name', $product->name) }}" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('name') border-red-500 @enderror"
+                            placeholder="Ex: Panneau solaire 300W">
+                        @error('name')
+                            <p class="text-red-500 text-sm mt-1 flex items-center">
+                                <span class="mr-1">⚠️</span> {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                    
+                    <div>
+                        <label for="category_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Catégorie <span class="text-red-500">*</span>
+                        </label>
+                        <select id="category_id" name="category_id" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('category_id') border-red-500 @enderror">
+                            <option value="">-- Sélectionnez une catégorie --</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('category_id')
+                            <p class="text-red-500 text-sm mt-1 flex items-center">
+                                <span class="mr-1">⚠️</span> {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Description <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="description" name="description" rows="5" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('description') border-red-500 @enderror"
+                        placeholder="Décrivez le produit en détail...">{{ old('description', $product->description) }}</textarea>
+                    @error('description')
+                        <p class="text-red-500 text-sm mt-1 flex items-center">
+                            <span class="mr-1">⚠️</span> {{ $message }}
+                        </p>
                     @enderror
                 </div>
-                
-                <div>
-                    <label for="category_id" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Catégorie *</label>
-                    <select id="category_id" name="category_id" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie @error('category_id') border-red-500 @enderror">
-                        <option value="">Sélectionnez une catégorie</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('category_id')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+
+                <div class="mt-6">
+                    <label for="specifications" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Spécifications techniques
+                    </label>
+                    <textarea id="specifications" name="specifications" rows="4"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                        placeholder="Ex: Puissance: 300W, Voltage: 24V, Dimensions: 1640x992x40mm">{{ old('specifications', $product->specifications) }}</textarea>
+                    <p class="text-xs text-gray-500 mt-1">📋 Détails techniques du produit</p>
                 </div>
             </div>
 
-            <div>
-                <label for="description" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Description *</label>
-                <textarea id="description" name="description" rows="4" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie @error('description') border-red-500 @enderror">{{ old('description', $product->description) }}</textarea>
-                @error('description')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
-                <label for="specifications" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Spécifications techniques</label>
-                <textarea id="specifications" name="specifications" rows="3"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie">{{ old('specifications', $product->specifications) }}</textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <label for="price" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Prix (FCFA) *</label>
-                    <input type="number" id="price" name="price" value="{{ old('price', $product->price) }}" min="0" step="1" required
-                        class="w-full admin-input-bf px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie @error('price') border-red-500 @enderror">
-                    @error('price')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+            {{-- Prix et stock --}}
+            <div class="border-b pb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">2</span>
+                    Prix et stock
+                </h2>
                 
-                <div>
-                    <label for="promotional_price" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Prix promotionnel (FCFA)</label>
-                    <input type="number" id="promotional_price" name="promotional_price" value="{{ old('promotional_price', $product->promotional_price) }}" min="0" step="1"
-                        class="w-full admin-input-bf px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="price" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Prix normal (FCFA) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="price" name="price" value="{{ old('price', $product->price) }}" min="0" step="1" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('price') border-red-500 @enderror"
+                                placeholder="0">
+                            <span class="absolute right-3 top-3 text-gray-400 font-medium">FCFA</span>
+                        </div>
+                        @error('price')
+                            <p class="text-red-500 text-sm mt-1 flex items-center">
+                                <span class="mr-1">⚠️</span> {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                    
+                    <div>
+                        <label for="promotional_price" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Prix promotionnel (FCFA)
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="promotional_price" name="promotional_price" value="{{ old('promotional_price', $product->promotional_price) }}" min="0" step="1"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                                placeholder="0">
+                            <span class="absolute right-3 top-3 text-gray-400 font-medium">FCFA</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">🏷️ Optionnel - Prix en promotion</p>
+                    </div>
+                    
+                    <div>
+                        <label for="stock_quantity" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Quantité en stock <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}" min="0" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('stock_quantity') border-red-500 @enderror"
+                            placeholder="0">
+                        @error('stock_quantity')
+                            <p class="text-red-500 text-sm mt-1 flex items-center">
+                                <span class="mr-1">⚠️</span> {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
                 </div>
-                
-                <div>
-                    <label for="stock_quantity" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Quantité en stock *</label>
-                    <input type="number" id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}" min="0" required
-                        class="w-full admin-input-bf px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie @error('stock_quantity') border-red-500 @enderror">
-                    @error('stock_quantity')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+
+                <div class="mt-6">
+                    <label for="warranty" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Garantie
+                    </label>
+                    <input type="text" id="warranty" name="warranty" value="{{ old('warranty', $product->warranty) }}" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                        placeholder="Ex: 2 ans, 12 mois, Garantie constructeur">
+                    <p class="text-xs text-gray-500 mt-1">🛡️ Informations sur la garantie du produit</p>
                 </div>
             </div>
 
-            <div>
-                <label for="warranty" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Garantie</label>
-                <input type="text" id="warranty" name="warranty" value="{{ old('warranty', $product->warranty) }}" placeholder="Ex: 2 ans"
-                    class="w-full admin-input-bf px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie">
-            </div>
+            {{-- Gestion des médias --}}
+            <div class="border-b pb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">3</span>
+                    Gestion des images et vidéos
+                </h2>
 
-            <!-- ✅ SECTION MÉDIAS EXISTANTS ET NOUVEAUX -->
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">📸 Gestion des images et vidéos</h3>
-                
-                <!-- ✅ IMAGES EXISTANTES -->
+                {{-- Images existantes --}}
                 @if($product->hasImages())
-                    <div class="mb-6">
-                        <h4 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs mr-2">{{ $product->images_count }}</span>
-                            Images actuelles
-                        </h4>
-                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <div class="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-bold text-gray-900 flex items-center">
+                                <span class="bg-blue-500 text-white px-2.5 py-0.5 rounded-full text-xs mr-2">{{ $product->images_count }}</span>
+                                📸 Images actuelles
+                            </h3>
+                            <p class="text-xs text-gray-600">Cliquez sur ✕ pour supprimer une image</p>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                             @foreach($product->image_urls as $index => $imageUrl)
-                                <div class="relative group" data-image-index="{{ $index }}">
+                                <div class="relative group transition-all duration-300" data-image-index="{{ $index }}">
                                     <img src="{{ $imageUrl }}" alt="Image {{ $index + 1 }}" 
-                                         class="w-full h-20 object-cover rounded-lg shadow-sm border">
+                                         class="w-full h-24 object-cover rounded-lg shadow-md group-hover:shadow-xl transition border-2 border-transparent group-hover:border-blue-500">
                                     <button type="button"
                                             onclick="removeExistingImage({{ $index }}, this)"
-                                            class="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all duration-200"
+                                            class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 transform hover:scale-110"
                                             title="Supprimer cette image">
                                         ✕
                                     </button>
-                                    <div class="absolute bottom-1 left-1 bg-black bg-opacity-60 text-white text-xs px-1 rounded">
-                                        {{ $index + 1 }}
+                                    <div class="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-0.5 rounded">
+                                        #{{ $index + 1 }}
                                     </div>
                                 </div>
                             @endforeach
@@ -131,28 +190,31 @@
                     </div>
                 @endif
 
-                <!-- ✅ VIDÉOS EXISTANTES -->
+                {{-- Vidéos existantes --}}
                 @if($product->hasVideos())
-                    <div class="mb-6">
-                        <h4 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
-                            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs mr-2">{{ $product->videos_count }}</span>
-                            Vidéos actuelles
-                        </h4>
+                    <div class="mb-8 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-bold text-gray-900 flex items-center">
+                                <span class="bg-purple-500 text-white px-2.5 py-0.5 rounded-full text-xs mr-2">{{ $product->videos_count }}</span>
+                                🎥 Vidéos actuelles
+                            </h3>
+                            <p class="text-xs text-gray-600">Cliquez sur ✕ pour supprimer une vidéo</p>
+                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             @foreach($product->video_urls as $index => $videoUrl)
-                                <div class="relative group bg-gray-100 rounded-lg overflow-hidden" data-video-index="{{ $index }}">
-                                    <video class="w-full h-24 object-cover" preload="metadata" controls>
+                                <div class="relative group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300" data-video-index="{{ $index }}">
+                                    <video class="w-full h-32 object-cover" preload="metadata" controls>
                                         <source src="{{ $videoUrl }}" type="video/mp4">
                                         Votre navigateur ne supporte pas la lecture de vidéos.
                                     </video>
                                     <button type="button"
                                             onclick="removeExistingVideo({{ $index }}, this)"
-                                            class="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all duration-200"
+                                            class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 transform hover:scale-110"
                                             title="Supprimer cette vidéo">
                                         ✕
                                     </button>
-                                    <div class="absolute bottom-1 left-1 bg-black bg-opacity-60 text-white text-xs px-1 rounded">
-                                        Vidéo {{ $index + 1 }}
+                                    <div class="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-0.5 rounded">
+                                        Vidéo #{{ $index + 1 }}
                                     </div>
                                 </div>
                             @endforeach
@@ -160,91 +222,119 @@
                     </div>
                 @endif
 
-                <!-- ✅ AJOUT DE NOUVELLES IMAGES -->
-                <div class="mb-6">
-                    <label for="new_images" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">
+                {{-- Ajouter nouvelles images --}}
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">
                         ➕ Ajouter de nouvelles images
                     </label>
-                    <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-vert-energie transition">
-                        <div class="space-y-1 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <div class="mt-2 flex justify-center px-6 pt-8 pb-8 border-2 border-gray-300 border-dashed rounded-lg hover:border-green-500 transition-colors bg-gray-50 hover:bg-green-50">
+                        <div class="space-y-2 text-center">
+                            <svg class="mx-auto h-16 w-16 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
-                            <div class="flex text-sm text-gray-600">
-                                <label for="new_images" class="relative cursor-pointer bg-white rounded-md font-medium text-vert-energie hover:text-green-500">
-                                    <span>Sélectionner des images</span>
+                            <div class="flex text-sm text-gray-600 justify-center">
+                                <label for="new_images" class="relative cursor-pointer bg-white rounded-md font-semibold text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-500 px-3 py-1">
+                                    <span>Choisir des images</span>
                                     <input id="new_images" name="images[]" type="file" class="sr-only" multiple accept="image/*">
                                 </label>
                                 <p class="pl-1">ou glisser-déposer</p>
                             </div>
-                            <p class="text-xs text-gray-500">JPG, PNG, GIF jusqu'à 2MB chacune</p>
+                            <p class="text-xs text-gray-500">JPG, PNG, GIF jusqu'à 2MB par image</p>
                         </div>
                     </div>
                     <div id="new-images-preview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
                 </div>
 
-                <!-- ✅ AJOUT DE NOUVELLES VIDÉOS -->
+                {{-- Ajouter nouvelles vidéos --}}
                 <div class="mb-4">
-                    <label for="new_videos" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">
                         ➕ Ajouter de nouvelles vidéos
                     </label>
-                    <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-vert-energie transition">
-                        <div class="space-y-1 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="mt-2 flex justify-center px-6 pt-8 pb-8 border-2 border-gray-300 border-dashed rounded-lg hover:border-green-500 transition-colors bg-gray-50 hover:bg-green-50">
+                        <div class="space-y-2 text-center">
+                            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
-                            <div class="flex text-sm text-gray-600">
-                                <label for="new_videos" class="relative cursor-pointer bg-white rounded-md font-medium text-vert-energie hover:text-green-500">
-                                    <span>Sélectionner des vidéos</span>
+                            <div class="flex text-sm text-gray-600 justify-center">
+                                <label for="new_videos" class="relative cursor-pointer bg-white rounded-md font-semibold text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-500 px-3 py-1">
+                                    <span>Choisir des vidéos</span>
                                     <input id="new_videos" name="videos[]" type="file" class="sr-only" multiple accept="video/*">
                                 </label>
                                 <p class="pl-1">ou glisser-déposer</p>
                             </div>
-                            <p class="text-xs text-gray-500">MP4, MOV, AVI jusqu'à 20MB chacune</p>
+                            <p class="text-xs text-gray-500">MP4, MOV, AVI jusqu'à 20MB par vidéo</p>
                         </div>
                     </div>
                     <div id="new-videos-preview" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
-                <!-- ✅ CHAMPS CACHÉS pour gérer les suppressions -->
+                {{-- Champs cachés pour les suppressions --}}
                 <input type="hidden" name="remove_images" id="remove_images" value="">
                 <input type="hidden" name="remove_videos" id="remove_videos" value="">
             </div>
 
-            <div class="flex flex-wrap gap-6">
-                <label class="flex items-center admin-label-bf">
-                    <input type="checkbox" name="is_active" value="1" {{ old('is_active', $product->is_active) ? 'checked' : '' }}
-                        class="rounded border-gray-300 text-vert-energie shadow-sm focus:border-vert-energie focus:ring focus:ring-vert-energie focus:ring-opacity-50">
-                    <span class="ml-2 text-sm text-gray-700">Produit actif</span>
-                </label>
-                <label class="flex items-center admin-label-bf">
-                    <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}
-                        class="rounded admin-input-bf border-gray-300 text-vert-energie shadow-sm focus:border-vert-energie focus:ring focus:ring-vert-energie focus:ring-opacity-50">
-                    <span class="ml-2 text-sm text-gray-700">Produit vedette</span>
-                </label>
+            {{-- Options --}}
+            <div class="border-b pb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">4</span>
+                    Options du produit
+                </h2>
+                
+                <div class="flex flex-wrap gap-6">
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" name="is_active" value="1" {{ old('is_active', $product->is_active) ? 'checked' : '' }}
+                            class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50 w-5 h-5">
+                        <span class="ml-3 text-sm font-medium text-gray-700 group-hover:text-green-600 transition">
+                            ✅ Produit actif (visible sur le site)
+                        </span>
+                    </label>
+                    
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}
+                            class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50 w-5 h-5">
+                        <span class="ml-3 text-sm font-medium text-gray-700 group-hover:text-green-600 transition">
+                            ⭐ Produit vedette (mis en avant)
+                        </span>
+                    </label>
+                </div>
             </div>
 
-            <div class="border-t pt-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">🔍 Optimisation SEO</h3>
-                <div class="space-y-4">
+            {{-- SEO --}}
+            <div class="pb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">5</span>
+                    Optimisation SEO
+                </h2>
+                
+                <div class="space-y-6">
                     <div>
-                        <label for="meta_title" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Titre SEO</label>
-                        <input type="text" id="meta_title" name="meta_title" value="{{ old('meta_title', $product->meta_title) }}"
-                            class="w-full admin-input-bf px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie">
+                        <label for="meta_title" class="block text-sm font-semibold text-gray-700 mb-2">
+                            🏷️ Titre SEO
+                        </label>
+                        <input type="text" id="meta_title" name="meta_title" value="{{ old('meta_title', $product->meta_title) }}" maxlength="60"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                            placeholder="Titre optimisé pour les moteurs de recherche">
+                        <p class="text-xs text-gray-500 mt-1">Recommandé: 50-60 caractères</p>
                     </div>
+                    
                     <div>
-                        <label for="meta_description" class="block admin-label-bf text-sm font-medium text-gray-700 mb-2">Description SEO</label>
-                        <textarea id="meta_description" name="meta_description" rows="2"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vert-energie">{{ old('meta_description', $product->meta_description) }}</textarea>
+                        <label for="meta_description" class="block text-sm font-semibold text-gray-700 mb-2">
+                            📝 Description SEO
+                        </label>
+                        <textarea id="meta_description" name="meta_description" rows="3" maxlength="160"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                            placeholder="Description optimisée pour les moteurs de recherche">{{ old('meta_description', $product->meta_description) }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">Recommandé: 150-160 caractères</p>
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-between pt-6 border-t">
-                <a href="{{ route('admin.products.index') }}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
-                    ← Retour
+            {{-- Actions --}}
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t">
+                <a href="{{ route('admin.products.index') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors">
+                    ← Annuler
                 </a>
-                <button type="submit" class="bg-vert-energie admin-btn-bf text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105">
                     💾 Mettre à jour le produit
                 </button>
             </div>
@@ -255,111 +345,134 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Initialisation de l\'édition produit...');
+    console.log('🚀 Initialisation de l\'édition du produit...');
 
-    // ✅ GESTION DES SUPPRESSIONS
+    // Gestion des suppressions
     let imagesToRemove = [];
     let videosToRemove = [];
 
+    // Supprimer une image existante
     window.removeExistingImage = function(imageIndex, buttonElement) {
-        if (confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
-            // Masquer visuellement
+        if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer cette image ?')) {
             const imageContainer = buttonElement.closest('[data-image-index]');
             imageContainer.style.opacity = '0.3';
+            imageContainer.style.filter = 'grayscale(100%)';
             imageContainer.style.pointerEvents = 'none';
             
-            // Ajouter à la liste des suppressions
             imagesToRemove.push(imageIndex);
             document.getElementById('remove_images').value = imagesToRemove.join(',');
             
             console.log('🗑️ Image marquée pour suppression:', imageIndex);
+            
+            // Afficher une notification
+            if (window.showAdminNotification) {
+                window.showAdminNotification('Image marquée pour suppression', 'warning');
+            }
         }
     };
 
+    // Supprimer une vidéo existante
     window.removeExistingVideo = function(videoIndex, buttonElement) {
-        if (confirm('Êtes-vous sûr de vouloir supprimer cette vidéo ?')) {
-            // Masquer visuellement
+        if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer cette vidéo ?')) {
             const videoContainer = buttonElement.closest('[data-video-index]');
             videoContainer.style.opacity = '0.3';
+            videoContainer.style.filter = 'grayscale(100%)';
             videoContainer.style.pointerEvents = 'none';
             
-            // Ajouter à la liste des suppressions
             videosToRemove.push(videoIndex);
             document.getElementById('remove_videos').value = videosToRemove.join(',');
             
             console.log('🗑️ Vidéo marquée pour suppression:', videoIndex);
+            
+            if (window.showAdminNotification) {
+                window.showAdminNotification('Vidéo marquée pour suppression', 'warning');
+            }
         }
     };
 
-    // ✅ PRÉVISUALISATION NOUVELLES IMAGES
+    // Prévisualisation nouvelles images
     const newImagesInput = document.getElementById('new_images');
     const newImagesPreview = document.getElementById('new-images-preview');
     
-    newImagesInput.addEventListener('change', function(e) {
-        newImagesPreview.innerHTML = '';
-        
-        Array.from(e.target.files).forEach((file, index) => {
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'relative bg-white rounded-lg shadow border';
-                    div.innerHTML = `
-                        <img src="${e.target.result}" class="w-full h-20 object-cover rounded-t-lg">
-                        <div class="p-2">
-                            <p class="text-xs text-gray-600 truncate">${file.name}</p>
-                            <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(1)} MB</p>
-                        </div>
-                        <div class="absolute top-1 right-1 bg-green-500 text-white text-xs px-1 rounded">NOUVEAU</div>
-                    `;
-                    newImagesPreview.appendChild(div);
-                };
-                reader.readAsDataURL(file);
-            }
+    if (newImagesInput && newImagesPreview) {
+        newImagesInput.addEventListener('change', function(e) {
+            newImagesPreview.innerHTML = '';
+            
+            Array.from(e.target.files).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'relative bg-white rounded-lg shadow-md overflow-hidden border-2 border-green-300';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" class="w-full h-24 object-cover">
+                            <div class="p-2 bg-green-50">
+                                <p class="text-xs text-gray-700 font-medium truncate">${file.name}</p>
+                                <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(1)} KB</p>
+                            </div>
+                            <div class="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full shadow font-bold">NOUVEAU</div>
+                        `;
+                        newImagesPreview.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            console.log(`📸 ${e.target.files.length} nouvelle(s) image(s) ajoutée(s)`);
         });
-        
-        console.log(`📸 ${e.target.files.length} nouvelle(s) image(s) sélectionnée(s)`);
-    });
+    }
 
-    // ✅ PRÉVISUALISATION NOUVELLES VIDÉOS
+    // Prévisualisation nouvelles vidéos
     const newVideosInput = document.getElementById('new_videos');
     const newVideosPreview = document.getElementById('new-videos-preview');
     
-    newVideosInput.addEventListener('change', function(e) {
-        newVideosPreview.innerHTML = '';
-        
-        Array.from(e.target.files).forEach((file, index) => {
-            if (file.type.startsWith('video/')) {
-                const div = document.createElement('div');
-                div.className = 'relative bg-white rounded-lg shadow border p-4';
-                div.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <svg class="w-8 h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
-                            <p class="text-xs text-gray-600">${(file.size / 1024 / 1024).toFixed(1)} MB</p>
+    if (newVideosInput && newVideosPreview) {
+        newVideosInput.addEventListener('change', function(e) {
+            newVideosPreview.innerHTML = '';
+            
+            Array.from(e.target.files).forEach((file, index) => {
+                if (file.type.startsWith('video/')) {
+                    const div = document.createElement('div');
+                    div.className = 'relative bg-white rounded-lg shadow-md p-4 border-2 border-green-300';
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0">
+                                <svg class="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-gray-900 truncate">${file.name}</p>
+                                <p class="text-xs text-gray-600">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            </div>
+                            <div class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow">NOUVEAU</div>
                         </div>
-                        <div class="bg-green-500 text-white text-xs px-2 py-1 rounded">NOUVEAU</div>
-                    </div>
-                `;
-                newVideosPreview.appendChild(div);
+                    `;
+                    newVideosPreview.appendChild(div);
+                }
+            });
+            
+            console.log(`🎥 ${e.target.files.length} nouvelle(s) vidéo(s) ajoutée(s)`);
+        });
+    }
+
+    // Validation avant soumission
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            console.log(`📋 Modifications en cours...`);
+            console.log(`🗑️ ${imagesToRemove.length} image(s) à supprimer`);
+            console.log(`🗑️ ${videosToRemove.length} vidéo(s) à supprimer`);
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="animate-spin inline-block mr-2">⏳</span> Mise à jour en cours...';
             }
         });
-        
-        console.log(`🎥 ${e.target.files.length} nouvelle(s) vidéo(s) sélectionnée(s)`);
-    });
+    }
 
-    // ✅ VALIDATION AVANT SOUMISSION
-    const form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
-        const newImages = newImagesInput.files;
-        const newVideos = newVideosInput.files;
-        
-        console.log(`📋 Soumission: ${imagesToRemove.length} image(s) supprimée(s), ${videosToRemove.length} vidéo(s) supprimée(s)`);
-        console.log(`📋 Ajout: ${newImages.length} nouvelle(s) image(s), ${newVideos.length} nouvelle(s) vidéo(s)`);
-    });
+    console.log('✅ Formulaire d\'édition initialisé avec succès');
 });
 </script>
 @endpush
