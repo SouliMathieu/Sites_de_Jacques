@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.app')
 
 @section('title', 'Passer une commande - Jackson Energy International')
 
@@ -64,26 +64,47 @@
     </div>
 </div>
 
-{{-- Main Form --}}
+{{-- Main Form (étape 1) --}}
 <div class="container mx-auto px-4 py-12">
     <form method="POST" action="{{ route('orders.store') }}" class="max-w-6xl mx-auto" id="orderForm">
         @csrf
-        
-        {{-- Messages d'erreur globaux --}}
-        @if($errors->any())
-        <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-md">
-            <div class="flex items-start">
-                <span class="text-2xl mr-3">⚠️</span>
-                <div class="flex-1">
-                    <p class="font-semibold mb-2">Veuillez corriger les erreurs suivantes :</p>
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach($errors->all() as $error)
+        @if(session('error'))
+    <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-800 p-4 rounded-lg">
+        {{ session('error') }}
+    </div>
+@endif
+
+@if($errors->any())
+    <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-md">
+        <div class="flex items-start">
+            <span class="text-2xl mr-3">⚠️</span>
+            <div class="flex-1">
+                <p class="font-semibold mb-2">Veuillez corriger les erreurs suivantes :</p>
+                <ul class="list-disc list-inside space-y-1">
+                    @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+                    @endforeach
+                </ul>
             </div>
         </div>
+    </div>
+@endif
+
+        {{-- Messages d'erreur globaux --}}
+        @if($errors->any())
+            <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-md">
+                <div class="flex items-start">
+                    <span class="text-2xl mr-3">⚠️</span>
+                    <div class="flex-1">
+                        <p class="font-semibold mb-2">Veuillez corriger les erreurs suivantes :</p>
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
         @endif
 
         <div class="grid lg:grid-cols-3 gap-8">
@@ -95,104 +116,116 @@
                         <span class="bg-blue-100 text-blue-600 rounded-full w-10 h-10 flex items-center justify-center mr-3 text-lg">👤</span>
                         Informations client
                     </h2>
-                    
+
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label for="customer_name" class="block text-sm font-bold text-gray-700 mb-2">
                                 Nom complet <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" 
-                                   id="customer_name" 
-                                   name="customer_name" 
-                                   value="{{ old('customer_name') }}" 
-                                   required 
-                                   placeholder="Ex: Jean Ouédraogo"
-                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('customer_name') border-red-500 @enderror">
+                            <input
+                                type="text"
+                                id="customer_name"
+                                name="customer_name"
+                                value="{{ old('customer_name') }}"
+                                required
+                                placeholder="Ex: Jean Ouédraogo"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('customer_name') border-red-500 @enderror"
+                            >
                             @error('customer_name')
                                 <p class="text-red-500 text-sm mt-1 flex items-center">
                                     <span class="mr-1">⚠️</span> {{ $message }}
                                 </p>
                             @enderror
                         </div>
-                        
+
                         <div>
                             <label for="customer_phone" class="block text-sm font-bold text-gray-700 mb-2">
                                 Téléphone <span class="text-red-500">*</span>
                             </label>
-                            <input type="tel" 
-                                   id="customer_phone" 
-                                   name="customer_phone" 
-                                   value="{{ old('customer_phone') }}" 
-                                   required 
-                                   placeholder="+226 XX XX XX XX"
-                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('customer_phone') border-red-500 @enderror">
+                            <input
+                                type="tel"
+                                id="customer_phone"
+                                name="customer_phone"
+                                value="{{ old('customer_phone') }}"
+                                required
+                                placeholder="+226 XX XX XX XX"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('customer_phone') border-red-500 @enderror"
+                            >
                             @error('customer_phone')
                                 <p class="text-red-500 text-sm mt-1 flex items-center">
                                     <span class="mr-1">⚠️</span> {{ $message }}
                                 </p>
                             @enderror
                         </div>
-                        
+
                         <div>
                             <label for="customer_email" class="block text-sm font-bold text-gray-700 mb-2">
                                 Email
                             </label>
-                            <input type="email" 
-                                   id="customer_email" 
-                                   name="customer_email" 
-                                   value="{{ old('customer_email') }}" 
-                                   placeholder="email@exemple.com"
-                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                            <input
+                                type="email"
+                                id="customer_email"
+                                name="customer_email"
+                                value="{{ old('customer_email') }}"
+                                placeholder="email@exemple.com"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                            >
                         </div>
-                        
+
                         <div class="md:col-span-2">
                             <label for="customer_company" class="block text-sm font-bold text-gray-700 mb-2">
                                 Entreprise / Organisation
                             </label>
-                            <input type="text" 
-                                   id="customer_company" 
-                                   name="customer_company" 
-                                   value="{{ old('customer_company') }}" 
-                                   placeholder="Nom de votre entreprise (optionnel)"
-                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                            <input
+                                type="text"
+                                id="customer_company"
+                                name="customer_company"
+                                value="{{ old('customer_company') }}"
+                                placeholder="Nom de votre entreprise (optionnel)"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                            >
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- Informations de livraison --}}
                 <div class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-purple-500">
                     <h2 class="text-2xl font-montserrat font-bold mb-6 text-gray-900 flex items-center">
                         <span class="bg-purple-100 text-purple-600 rounded-full w-10 h-10 flex items-center justify-center mr-3 text-lg">🚚</span>
                         Informations de livraison
                     </h2>
-                    
+
                     <div class="space-y-6">
                         <div>
                             <label for="delivery_address" class="block text-sm font-bold text-gray-700 mb-2">
                                 Adresse de livraison <span class="text-red-500">*</span>
                             </label>
-                            <textarea id="delivery_address" 
-                                      name="delivery_address" 
-                                      rows="3" 
-                                      required 
-                                      placeholder="Entrez l'adresse complète de livraison..."
-                                      class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('delivery_address') border-red-500 @enderror">{{ old('delivery_address') }}</textarea>
+                            <textarea
+                                id="delivery_address"
+                                name="delivery_address"
+                                rows="3"
+                                required
+                                placeholder="Entrez l'adresse complète de livraison..."
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('delivery_address') border-red-500 @enderror"
+                            >{{ old('delivery_address') }}</textarea>
                             @error('delivery_address')
                                 <p class="text-red-500 text-sm mt-1 flex items-center">
                                     <span class="mr-1">⚠️</span> {{ $message }}
                                 </p>
                             @enderror
                         </div>
-                        
+
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label for="delivery_city" class="block text-sm font-bold text-gray-700 mb-2">
                                     Ville <span class="text-red-500">*</span>
                                 </label>
-                                <select id="delivery_city" 
-                                        name="delivery_city" 
-                                        required 
-                                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('delivery_city') border-red-500 @enderror">
+                                <select
+                                    id="delivery_city"
+                                    name="delivery_city"
+                                    required
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('delivery_city') border-red-500 @enderror"
+                                >
                                     <option value="">Sélectionnez une ville</option>
                                     <option value="Ouagadougou" {{ old('delivery_city') == 'Ouagadougou' ? 'selected' : '' }}>🏙️ Ouagadougou</option>
                                     <option value="Bobo-Dioulasso" {{ old('delivery_city') == 'Bobo-Dioulasso' ? 'selected' : '' }}>🏙️ Bobo-Dioulasso</option>
@@ -209,18 +242,20 @@
                                     </p>
                                 @enderror
                             </div>
-                            
+
                             <div>
                                 <label for="delivery_phone" class="block text-sm font-bold text-gray-700 mb-2">
                                     Téléphone de livraison <span class="text-red-500">*</span>
                                 </label>
-                                <input type="tel" 
-                                       id="delivery_phone" 
-                                       name="delivery_phone" 
-                                       value="{{ old('delivery_phone') }}" 
-                                       required 
-                                       placeholder="+226 XX XX XX XX"
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('delivery_phone') border-red-500 @enderror">
+                                <input
+                                    type="tel"
+                                    id="delivery_phone"
+                                    name="delivery_phone"
+                                    value="{{ old('delivery_phone') }}"
+                                    required
+                                    placeholder="+226 XX XX XX XX"
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('delivery_phone') border-red-500 @enderror"
+                                >
                                 @error('delivery_phone')
                                     <p class="text-red-500 text-sm mt-1 flex items-center">
                                         <span class="mr-1">⚠️</span> {{ $message }}
@@ -230,112 +265,24 @@
                         </div>
                     </div>
                 </div>
-                
-                {{-- Méthode de paiement --}}
-                <div class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-green-500">
-                    <h2 class="text-2xl font-montserrat font-bold mb-6 text-gray-900 flex items-center">
-                        <span class="bg-green-100 text-green-600 rounded-full w-10 h-10 flex items-center justify-center mr-3 text-lg">💳</span>
-                        Méthode de paiement
-                    </h2>
-                    
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <label class="payment-option">
-                            <input type="radio" name="payment_method" value="orange_money" class="payment-radio" required>
-                            <div class="payment-card">
-                                <div class="flex items-center">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4 shadow-md">
-                                        OM
-                                    </div>
-                                    <div>
-                                        <span class="font-bold text-gray-900 block">Orange Money</span>
-                                        <span class="text-xs text-gray-500">Paiement mobile sécurisé</span>
-                                    </div>
-                                </div>
-                                <span class="checkmark">✓</span>
-                            </div>
-                        </label>
-                        
-                        <label class="payment-option">
-                            <input type="radio" name="payment_method" value="moov_money" class="payment-radio" required>
-                            <div class="payment-card">
-                                <div class="flex items-center">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4 shadow-md">
-                                        MM
-                                    </div>
-                                    <div>
-                                        <span class="font-bold text-gray-900 block">Moov Money</span>
-                                        <span class="text-xs text-gray-500">Paiement mobile sécurisé</span>
-                                    </div>
-                                </div>
-                                <span class="checkmark">✓</span>
-                            </div>
-                        </label>
-                        
-                        <label class="payment-option">
-                            <input type="radio" name="payment_method" value="bank_transfer" class="payment-radio" required>
-                            <div class="payment-card">
-                                <div class="flex items-center">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center text-white text-2xl mr-4 shadow-md">
-                                        🏦
-                                    </div>
-                                    <div>
-                                        <span class="font-bold text-gray-900 block">Virement bancaire</span>
-                                        <span class="text-xs text-gray-500">Transfert bancaire classique</span>
-                                    </div>
-                                </div>
-                                <span class="checkmark">✓</span>
-                            </div>
-                        </label>
-                        
-                        <label class="payment-option">
-                            <input type="radio" name="payment_method" value="cash_on_delivery" class="payment-radio" required>
-                            <div class="payment-card">
-                                <div class="flex items-center">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-700 rounded-full flex items-center justify-center text-white text-2xl mr-4 shadow-md">
-                                        💵
-                                    </div>
-                                    <div>
-                                        <span class="font-bold text-gray-900 block">Paiement à la livraison</span>
-                                        <span class="text-xs text-gray-500">Espèces ou mobile money</span>
-                                    </div>
-                                </div>
-                                <span class="checkmark">✓</span>
-                            </div>
-                        </label>
-                    </div>
-                    
-                    {{-- Champ téléphone paiement mobile --}}
-                    <div id="payment-phone-field" class="mt-6 hidden">
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <label for="payment_phone" class="block text-sm font-bold text-gray-700 mb-2">
-                                Numéro de téléphone pour le paiement <span class="text-red-500">*</span>
-                            </label>
-                            <input type="tel" 
-                                   id="payment_phone" 
-                                   name="payment_phone" 
-                                   value="{{ old('payment_phone') }}" 
-                                   placeholder="+226 XX XX XX XX"
-                                   class="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                            <p class="text-xs text-blue-600 mt-2">📱 Assurez-vous que ce numéro est enregistré pour le paiement mobile</p>
-                        </div>
-                    </div>
-                </div>
-                
+
                 {{-- Notes supplémentaires --}}
                 <div class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-yellow-500">
                     <h2 class="text-2xl font-montserrat font-bold mb-6 text-gray-900 flex items-center">
                         <span class="bg-yellow-100 text-yellow-600 rounded-full w-10 h-10 flex items-center justify-center mr-3 text-lg">📝</span>
                         Notes supplémentaires
                     </h2>
-                    
-                    <textarea id="notes" 
-                              name="notes" 
-                              rows="4" 
-                              placeholder="Ajoutez des instructions spéciales pour votre commande (optionnel)..."
-                              class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">{{ old('notes') }}</textarea>
+
+                    <textarea
+                        id="notes"
+                        name="notes"
+                        rows="4"
+                        placeholder="Ajoutez des instructions spéciales pour votre commande (optionnel)..."
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                    >{{ old('notes') }}</textarea>
                 </div>
             </div>
-            
+
             {{-- Colonne latérale - Récapitulatif (1/3) --}}
             <div class="lg:col-span-1">
                 <div class="sticky top-24">
@@ -344,15 +291,17 @@
                         <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
                             <span class="text-2xl mr-2">🛍️</span> Votre panier
                         </h3>
-                        
+
                         <div id="products-container" class="space-y-4">
                             @if($product)
                                 {{-- Produit pré-sélectionné --}}
                                 <div class="product-item border border-gray-200 rounded-lg p-4 hover:border-green-500 transition">
                                     <div class="flex items-start space-x-3">
-                                        <img src="{{ $product->first_image }}" 
-                                             alt="{{ $product->name }}" 
-                                             class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200">
+                                        <img
+                                            src="{{ $product->first_image }}"
+                                            alt="{{ $product->name }}"
+                                            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                                        >
                                         <div class="flex-1">
                                             <h4 class="font-bold text-sm text-gray-900">{{ $product->name }}</h4>
                                             <p class="text-xs text-gray-500">{{ $product->category->name ?? 'Non catégorisé' }}</p>
@@ -363,24 +312,27 @@
                                     </div>
                                     <div class="mt-3 flex items-center justify-between">
                                         <label class="text-xs font-semibold text-gray-700">Quantité:</label>
-                                        <input type="number" 
-                                               name="products[0][quantity]" 
-                                               value="{{ old('products.0.quantity', 1) }}" 
-                                               min="1" 
-                                               max="{{ $product->stock_quantity }}" 
-                                               class="w-20 px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-center font-bold"
-                                               data-price="{{ $product->price }}"
-                                               onchange="updateTotal()">
+                                        <input
+                                            type="number"
+                                            name="products[0][quantity]"
+                                            value="{{ old('products.0.quantity', 1) }}"
+                                            min="1"
+                                            max="{{ $product->stock_quantity }}"
+                                            class="w-20 px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-center font-bold"
+                                            data-price="{{ $product->price }}"
+                                            onchange="updateTotal()"
+                                        >
                                         <input type="hidden" name="products[0][id]" value="{{ $product->id }}">
                                     </div>
                                 </div>
                             @else
-                                {{-- Aucun produit --}}
                                 <div class="text-center py-8">
                                     <div class="text-5xl mb-3 opacity-30">🛒</div>
                                     <p class="text-gray-500 mb-4 font-medium">Votre panier est vide</p>
-                                    <a href="{{ route('products.index') }}" 
-                                       class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition">
+                                    <a
+                                        href="{{ route('products.index') }}"
+                                        class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition"
+                                    >
                                         <span class="mr-2">🛍️</span> Choisir des produits
                                     </a>
                                 </div>
@@ -388,21 +340,25 @@
                         </div>
 
                         @if($product)
-                        {{-- Total --}}
-                        <div class="mt-6 pt-4 border-t-2 border-gray-200">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-gray-600">Sous-total:</span>
-                                <span class="font-bold text-gray-900" id="subtotal">{{ number_format($product->price, 0, ',', ' ') }} FCFA</span>
+                            {{-- Total --}}
+                            <div class="mt-6 pt-4 border-t-2 border-gray-200">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-gray-600">Sous-total:</span>
+                                    <span class="font-bold text-gray-900" id="subtotal">
+                                        {{ number_format($product->price, 0, ',', ' ') }} FCFA
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-gray-600">Frais de livraison:</span>
+                                    <span class="font-bold text-green-600">Gratuit</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-3 border-t-2 border-green-200">
+                                    <span class="text-lg font-bold text-gray-900">Total:</span>
+                                    <span class="text-2xl font-bold text-green-600" id="total">
+                                        {{ number_format($product->price, 0, ',', ' ') }} FCFA
+                                    </span>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="text-gray-600">Frais de livraison:</span>
-                                <span class="font-bold text-green-600">Gratuit</span>
-                            </div>
-                            <div class="flex justify-between items-center pt-3 border-t-2 border-green-200">
-                                <span class="text-lg font-bold text-gray-900">Total:</span>
-                                <span class="text-2xl font-bold text-green-600" id="total">{{ number_format($product->price, 0, ',', ' ') }} FCFA</span>
-                            </div>
-                        </div>
                         @endif
                     </div>
 
@@ -431,135 +387,48 @@
                 </div>
             </div>
         </div>
-        
+
         {{-- Boutons d'action --}}
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 max-w-6xl">
-            <a href="{{ route('products.index') }}" 
-               class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors">
+            <a
+                href="{{ route('products.index') }}"
+                class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors"
+            >
                 ← Continuer les achats
             </a>
-            <button type="submit" 
-                    class="w-full sm:w-auto inline-flex justify-center items-center px-10 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold text-lg rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105">
-                <span class="mr-2">📋</span> Passer la commande
+            <button
+                type="submit"
+                class="w-full sm:w-auto inline-flex justify-center items-center px-10 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold text-lg rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+            >
+                <span class="mr-2">➡️</span> Continuer vers le paiement
             </button>
         </div>
     </form>
 </div>
 
-@push('styles')
-<style>
-/* Payment method cards */
-.payment-option {
-    cursor: pointer;
-}
-
-.payment-card {
-    position: relative;
-    border: 2px solid #e5e7eb;
-    border-radius: 0.75rem;
-    padding: 1.25rem;
-    transition: all 0.2s ease;
-    background: white;
-}
-
-.payment-option:hover .payment-card {
-    border-color: #10b981;
-    background: #f0fdf4;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
-}
-
-.payment-radio {
-    position: absolute;
-    opacity: 0;
-}
-
-.payment-radio:checked + .payment-card {
-    border-color: #10b981;
-    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
-}
-
-.checkmark {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    width: 24px;
-    height: 24px;
-    background: #10b981;
-    color: white;
-    border-radius: 50%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 0.875rem;
-}
-
-.payment-radio:checked + .payment-card .checkmark {
-    display: flex;
-}
-
-/* Animations */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.product-item {
-    animation: slideIn 0.3s ease-out;
-}
-</style>
-@endpush
-
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Gestion affichage champ téléphone paiement
-    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
-    const paymentPhoneField = document.getElementById('payment-phone-field');
-    const paymentPhoneInput = document.getElementById('payment_phone');
-    
-    paymentMethods.forEach(method => {
-        method.addEventListener('change', function() {
-            if (this.value === 'orange_money' || this.value === 'moov_money') {
-                paymentPhoneField.classList.remove('hidden');
-                paymentPhoneInput.required = true;
-            } else {
-                paymentPhoneField.classList.add('hidden');
-                paymentPhoneInput.required = false;
-            }
-        });
+function updateTotal() {
+    const quantityInputs = document.querySelectorAll('input[name^="products"][name$="[quantity]"]');
+    let total = 0;
+
+    quantityInputs.forEach(input => {
+        const price = parseFloat(input.dataset.price);
+        const quantity = parseInt(input.value) || 0;
+        total += price * quantity;
     });
 
-    // Calcul du total
-    window.updateTotal = function() {
-        const quantityInputs = document.querySelectorAll('input[name^="products"][name$="[quantity]"]');
-        let total = 0;
+    const subtotalEl = document.getElementById('subtotal');
+    const totalEl = document.getElementById('total');
 
-        quantityInputs.forEach(input => {
-            const price = parseFloat(input.dataset.price);
-            const quantity = parseInt(input.value) || 0;
-            total += price * quantity;
-        });
+    if (subtotalEl && totalEl) {
+        const formatted = new Intl.NumberFormat('fr-FR').format(total);
+        subtotalEl.textContent = formatted + ' FCFA';
+        totalEl.textContent = formatted + ' FCFA';
+    }
+}
 
-        const subtotalEl = document.getElementById('subtotal');
-        const totalEl = document.getElementById('total');
-        
-        if (subtotalEl && totalEl) {
-            const formatted = new Intl.NumberFormat('fr-FR').format(total);
-            subtotalEl.textContent = formatted + ' FCFA';
-            totalEl.textContent = formatted + ' FCFA';
-        }
-    };
-
-    // Validation du formulaire
+document.addEventListener('DOMContentLoaded', function() {
     const orderForm = document.getElementById('orderForm');
     if (orderForm) {
         orderForm.addEventListener('submit', function(e) {
@@ -570,10 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    console.log('✅ Page commande initialisée');
 });
 </script>
 @endpush
-
 @endsection

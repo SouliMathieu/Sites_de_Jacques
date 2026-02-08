@@ -1,0 +1,266 @@
+# Structure Complète du Projet JACKSON_ENERGY
+
+```
+JACKSON_ENERGY/
+├── .editorconfig
+├── .env
+├── .env.example
+├── .gitattributes
+├── .gitignore
+├── artisan
+├── composer.json
+├── composer.lock
+├── database:databaselocal.sqlite  // Fichier de la base SQLite                                                                                 ├── package-lock.json
+├── package.json
+├── phpunit.xml
+├── postcss.config.js
+├── Procfile
+├── README.md
+├── tailwind.config.js
+├── vite.config.js
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Admin/
+│   │   │   │   ├── AdCampaignController.php
+│   │   │   │   ├── CategoryController.php
+│   │   │   │   ├── DashboardController.php
+│   │   │   │   ├── ImageUploadController.php
+│   │   │   │   ├── OrderController.php
+│   │   │   │   └── ProductController.php
+│   │   │   ├── Auth/
+│   │   │   │   ├── AuthenticatedSessionController.php
+│   │   │   │   ├── ConfirmablePasswordController.php
+│   │   │   │   ├── EmailVerificationNotificationController.php
+│   │   │   │   ├── EmailVerificationPromptController.php
+│   │   │   │   ├── NewPasswordController.php
+│   │   │   │   ├── PasswordController.php
+│   │   │   │   ├── PasswordResetLinkController.php
+│   │   │   │   ├── RegisteredUserController.php
+│   │   │   │   └── VerifyEmailController.php
+│   │   │   ├── CategoryController.php
+│   │   │   ├── Controller.php
+│   │   │   ├── HomeController.php
+│   │   │   ├── OrderController.php
+│   │   │   ├── ProductController.php
+│   │   │   ├── ProfileController.php
+│   │   │   └── SitemapController.php
+│   │   ├── Middleware/
+│   │   │   └── AdminMiddleware.php
+│   │   └── Requests/
+│   │       ├── Auth/
+│   │       │   ├── LoginRequest.php
+│   │       │   └── ProfileUpdateRequest.php
+│   ├── Models/
+│   │   ├── AdCampaign.php
+│   │   ├── Category.php
+│   │   ├── Customer.php
+│   │   ├── Order.php
+│   │   ├── OrderItem.php
+│   │   ├── Product.php
+│   │   └── User.php
+│   ├── Providers/
+│   │   └── AppServiceProvider.php
+│   ├── Services/
+│   │   └── PdfService.php
+│   └── View/Components/
+│       ├── AppLayout.php
+│       └── GuestLayout.php
+├── bootstrap/
+│   ├── cache/
+│   ├── app.php
+│   └── providers.php
+├── config/
+│   ├── app.php
+│   ├── auth.php
+│   ├── cache.php
+│   ├── database.php
+│   ├── dompdf.php
+│   ├── filesystems.php
+│   ├── logging.php
+│   ├── mail.php
+│   ├── queue.php
+│   ├── services.php
+│   └── session.php
+├── database/
+│   ├── factories/
+│   │   └── UserFactory.php
+│   ├── migrations/
+│   │   ├── 0001_01_01_000000_create_users_table.php
+│   │   ├── 0001_01_01_000001_create_cache_table.php
+│   │   ├── 0001_01_01_000002_create_jobs_table.php
+│   │   ├── 2025_06_25_152856_create_categories_table.php
+│   │   ├── 2025_06_25_152857_create_orders_table.php
+│   │   ├── 2025_06_25_152857_create_products_table.php
+│   │   ├── 2025_06_25_152930_create_customers_table.php
+│   │   ├── 2025_06_25_152930_create_order_items_table.php
+│   │   ├── 2025_06_25_172443_add_role_to_users_table.php
+│   │   ├── 2025_06_26_124913_add_payment_fields_to_orders_table.php
+│   │   ├── 2025_06_26_152520_add_videos_to_products_table.php
+│   │   ├── 2025_06_28_205740_remove_unique_constraint_from_customers_email.php
+│   │   ├── 2025_07_31_134525_update_foreign_keys_for_sqlite.php
+│   │   ├── 2025_07_31_152504_create_ad_campaigns_table.php
+│   │   ├── 2026_02_03_015458_add_deleted_at_to_users_table.php
+│   │   ├── 2026_02_03_015942_add_soft_deletes_to_all_tables.php
+│   │   ├── 2026_02_03_023649_add_missing_columns_to_categories_table.php
+│   │   ├── 2026_02_03_024315_add_missing_columns_to_products_table.php
+│   │   ├── 2026_02_03_024454_add_sort_order_to_products_table.php
+│   │   ├── 2026_02_03_025838_add_is_active_to_users_table.php
+│   │   ├── 2026_02_03_030627_add_deleted_at_to_orders_table.php
+│   │   ├── 2026_02_03_034153_add_meta_keywords_to_products_table.php
+│   │   └── 2026_02_03_035113_add_parent_id_to_categories_table.php
+│   └── seeders/
+│       ├── AdminSeeder.php
+│       ├── CategorySeeder.php
+│       ├── DatabaseSeeder.php
+│       └── ProductSeeder.php
+├── node_modules/
+├── public/
+│   ├── assets/
+│   ├── build/
+│   │   ├── assets/
+│   │   ├── app-D-QZi6pXjs.js
+│   │   └── app-DM68duTy.css
+│   ├── css/
+│   ├── images/
+│   │   ├── carousel/
+│   │   │   ├── battery.png
+│   │   │   ├── frigo.png
+│   │   │   └── panneau.png
+│   │   └── logo/
+│   │       └── Logo.jpg
+│   ├── js/
+│   │   └── dropzone-simple.js
+│   ├── products/
+│   │   ├── electronique/
+│   │   │   └── Ultimate body.jpg
+│   │   ├── onduleurs/
+│   │   │   ├── Onduleur_Hybride1.jpg
+│   │   │   └── Batterie_200Ah.jpeg
+│   │   ├── Climatiseur_boreal.jpeg
+│   │   ├── Inverter_Welion.jpeg
+│   │   └── Panneau_550W.jpeg
+│   ├── storage/
+│   ├── videos/
+│   ├── .htaccess
+│   ├── favicon.ico
+│   └── manifest.json
+├── resources/
+│   ├── css/
+│   │   ├── admin.css
+│   │   └── app.css
+│   ├── js/
+│   │   ├── app.js
+│   │   └── bootstrap.js
+│   └── views/
+│       ├── admin/
+│       │   ├── ad-campaigns/
+│       │   │   ├── create.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── categories/
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── layouts/
+│       │   │   └── app.blade.php
+│       │   ├── orders/
+│       │   │   ├── index.blade.php
+│       │   │   ├── print.blade.php
+│       │   │   ├── receipt.blade.php
+│       │   │   └── show.blade.php
+│       │   └── products/
+│       │       ├── create.blade.php
+│       │       ├── edit.blade.php
+│       │       └── index.blade.php
+│       ├── auth/
+│       │   ├── confirm-password.blade.php
+│       │   ├── forgot-password.blade.php
+│       │   ├── login.blade.php
+│       │   ├── register.blade.php
+│       │   ├── reset-password.blade.php
+│       │   └── verify-email.blade.php
+│       ├── categories/
+│       │   ├── index.blade.php
+│       │   └── show.blade.php
+│       ├── components/
+│       │   ├── application-logo.blade.php
+│       │   ├── auth-session-status.blade.php
+│       │   ├── danger-button.blade.php
+│       │   ├── dropdown-link.blade.php
+│       │   ├── dropdown.blade.php
+│       │   ├── input-error.blade.php
+│       │   ├── input-label.blade.php
+│       │   ├── modal.blade.php
+│       │   ├── nav-link.blade.php
+│       │   ├── primary-button.blade.php
+│       │   ├── responsive-nav-link.blade.php
+│       │   ├── secondary-button.blade.php
+│       │   └── text-input.blade.php
+│       ├── layouts/
+│       │   ├── app.blade.php
+│       │   ├── guest.blade.php
+│       │   ├── navigation.blade.php
+│       │   └── public.blade.php
+│       ├── orders/
+│       │   ├── create.blade.php
+│       │   ├── payment.blade.php
+│       │   └── success.blade.php
+│       ├── products/
+│       │   ├── index.blade.php
+│       │   └── show.blade.php
+│       ├── profile/
+│       │   └── edit.blade.php
+│       ├── partials/
+│       │   ├── delete-user-form.blade.php
+│       │   ├── update-password-form.blade.php
+│       │   └── update-profile-information-form.blade.php
+│       └── (fichiers racine de views)/
+│           ├── contact.blade.php
+│           ├── dashboard.blade.php
+│           ├── home.blade.php
+│           ├── sitemap.blade.php
+│           └── welcome.blade.php
+├── routes/
+│   ├── auth.php
+│   ├── console.php
+│   └── web.php
+├── storage/
+│   ├── app/
+│   │   ├── private/
+│   │   ├── public/
+│   │   │   └── products/images/
+│   │   │       ├── 1770076351_1_panneau-solaire-de-250w.jpg
+│   │   │       ├── 1770090500_1_batterie-solaire-gel-parpar-12v-200ah-sp12-200.jpeg
+│   │   │       ├── 1770092660_1_climatiseur-split-boreal-inverter-economique-et-silencieux.jpg
+│   │   │       ├── 1770093117_1_onduleur-hybride-welion-102kw-we-hy-102kw-max.jpeg
+│   │   │       └── 1770093548_1_panneau-solaire-monocristallin-550w.jpeg
+│   │   └── .gitignore
+│   ├── framework/
+│   └── logs/
+├── tests/
+└── vendor/
+```
+
+## Notes importantes :
+
+1. **Projet Laravel** : Il s'agit d'une application Laravel avec :
+   - Laravel Breeze pour l'authentification
+   - Tailwind CSS pour le styling
+   - Vite comme bundler
+   - SQLite comme base de données
+
+2. **Structure MVC complète** :
+   - **Models** : Tous les modèles Eloquent
+   - **Controllers** : Contrôleurs organisés par fonctionnalité
+   - **Views** : Templates Blade organisés
+   - **Migrations** : Fichiers de migration de base de données
+
+3. **Fonctionnalités principales** :
+   - Système d'authentification complet
+   - Backoffice admin avec CRUD pour produits, catégories, commandes, campagnes pub
+   - E-commerce avec système de commandes
+   - Upload d'images avec stockage public
+   - Génération de PDF
+
