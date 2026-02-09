@@ -51,19 +51,40 @@
                         <p class="text-xs text-gray-500 mt-1">📝 Nom court et descriptif</p>
                     </div>
                     
-                    {{-- Slug (auto-généré) --}}
+                    {{-- Ordre d'affichage --}}
                     <div>
-                        <label for="slug" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Slug (URL)
+                        <label for="sort_order" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Ordre d'affichage <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               id="slug" 
-                               name="slug" 
-                               value="{{ old('slug') }}" 
-                               placeholder="panneaux-solaires"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition bg-gray-50">
-                        <p class="text-xs text-gray-500 mt-1">🔗 Généré automatiquement si vide</p>
+                        <input type="number" 
+                               id="sort_order" 
+                               name="sort_order" 
+                               value="{{ old('sort_order', 0) }}" 
+                               required
+                               min="0"
+                               placeholder="0"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('sort_order') border-red-500 @enderror">
+                        @error('sort_order')
+                            <p class="text-red-500 text-sm mt-1 flex items-center">
+                                <span class="mr-1">⚠️</span> {{ $message }}
+                            </p>
+                        @enderror
+                        <p class="text-xs text-gray-500 mt-1">🔢 Plus petit = affiché en premier</p>
                     </div>
+                </div>
+
+                {{-- Slug (auto-généré) --}}
+                <div class="mt-6">
+                    <label for="slug" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Slug (URL)
+                    </label>
+                    <input type="text" 
+                           id="slug" 
+                           name="slug" 
+                           value="{{ old('slug') }}" 
+                           placeholder="panneaux-solaires"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition bg-gray-50">
+                    <p class="text-xs text-gray-500 mt-1">🔗 Généré automatiquement si vide</p>
                 </div>
 
                 {{-- Description --}}
@@ -84,7 +105,7 @@
             <div class="border-b pb-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
                     <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">2</span>
-                    Image de la catégorie
+                    Image de la catégorie (optionnel)
                 </h2>
 
                 {{-- Option 1: Upload fichier --}}
@@ -139,87 +160,18 @@
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
                     <p class="text-xs text-gray-500 mt-1">🌐 Si vous avez déjà une image en ligne</p>
                 </div>
-            </div>
-            
-            {{-- Paramètres avancés --}}
-            <div class="border-b pb-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                    <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">3</span>
-                    Paramètres avancés
-                </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {{-- Ordre d'affichage --}}
-                    <div>
-                        <label for="sort_order" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Ordre d'affichage
-                        </label>
-                        <input type="number" 
-                               id="sort_order" 
-                               name="sort_order" 
-                               value="{{ old('sort_order', 0) }}" 
-                               min="0" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
-                        <p class="text-xs text-gray-500 mt-1">🔢 Plus petit = affiché en premier (0 par défaut)</p>
-                    </div>
-
-                    {{-- Icône (optionnel) --}}
-                    <div>
-                        <label for="icon" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Icône (emoji ou code)
-                        </label>
-                        <input type="text" 
-                               id="icon" 
-                               name="icon" 
-                               value="{{ old('icon') }}" 
-                               placeholder="☀️ ou <i class='fas fa-solar-panel'>"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
-                        <p class="text-xs text-gray-500 mt-1">✨ Emoji ou code HTML FontAwesome</p>
-                    </div>
-                </div>
-            </div>
-
-            {{-- SEO --}}
-            <div class="border-b pb-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                    <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">4</span>
-                    Optimisation SEO
-                </h2>
-
-                <div class="space-y-4">
-                    <div>
-                        <label for="meta_title" class="block text-sm font-semibold text-gray-700 mb-2">
-                            🏷️ Titre SEO
-                        </label>
-                        <input type="text" 
-                               id="meta_title" 
-                               name="meta_title" 
-                               value="{{ old('meta_title') }}" 
-                               maxlength="60"
-                               placeholder="Titre optimisé pour les moteurs de recherche"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
-                        <p class="text-xs text-gray-500 mt-1">Recommandé: 50-60 caractères</p>
-                    </div>
-
-                    <div>
-                        <label for="meta_description" class="block text-sm font-semibold text-gray-700 mb-2">
-                            📝 Description SEO
-                        </label>
-                        <textarea id="meta_description" 
-                                  name="meta_description" 
-                                  rows="3" 
-                                  maxlength="160"
-                                  placeholder="Description optimisée pour les moteurs de recherche"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">{{ old('meta_description') }}</textarea>
-                        <p class="text-xs text-gray-500 mt-1">Recommandé: 150-160 caractères</p>
-                    </div>
+                <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-sm text-blue-700">
+                        💡 <strong>Note:</strong> Si aucune image n'est fournie, une image par défaut avec les initiales de la catégorie sera générée automatiquement.
+                    </p>
                 </div>
             </div>
             
             {{-- Options --}}
             <div class="pb-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                    <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">5</span>
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">3</span>
                     Options de visibilité
                 </h2>
 
@@ -232,17 +184,6 @@
                                class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50 w-5 h-5">
                         <span class="ml-3 text-sm font-medium text-gray-700 group-hover:text-green-600 transition">
                             ✅ Catégorie active (visible sur le site)
-                        </span>
-                    </label>
-
-                    <label class="flex items-center cursor-pointer group">
-                        <input type="checkbox" 
-                               name="show_in_menu" 
-                               value="1" 
-                               {{ old('show_in_menu', true) ? 'checked' : '' }} 
-                               class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50 w-5 h-5">
-                        <span class="ml-3 text-sm font-medium text-gray-700 group-hover:text-green-600 transition">
-                            🔗 Afficher dans le menu de navigation
                         </span>
                     </label>
 
@@ -322,29 +263,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 delete this.dataset.autoGenerated;
             }
         });
-    }
-
-    // Compteur de caractères pour SEO
-    const metaTitle = document.getElementById('meta_title');
-    const metaDescription = document.getElementById('meta_description');
-
-    function updateCharCount(input, maxLength) {
-        const charCount = input.value.length;
-        const color = charCount > maxLength ? 'text-red-500' : charCount > maxLength * 0.9 ? 'text-yellow-500' : 'text-gray-500';
-        
-        let counter = input.nextElementSibling;
-        if (counter && counter.classList.contains('char-counter')) {
-            counter.textContent = `${charCount}/${maxLength} caractères`;
-            counter.className = `text-xs mt-1 char-counter ${color}`;
-        }
-    }
-
-    if (metaTitle) {
-        metaTitle.addEventListener('input', () => updateCharCount(metaTitle, 60));
-    }
-
-    if (metaDescription) {
-        metaDescription.addEventListener('input', () => updateCharCount(metaDescription, 160));
     }
 });
 

@@ -1,166 +1,185 @@
-@extends('layouts.app', ['title' => 'Nos Catégories - Jackson Energy International', 'description' => 'Découvrez nos catégories de produits solaires : panneaux, batteries, onduleurs, régulateurs au Burkina Faso.'])
+@extends('layouts.app')
+
+@section('title', 'Toutes les catégories - Jackson Energy International')
 
 @section('content')
-    {{-- Header de la page --}}
-    <section class="bg-gradient-to-r from-blue-50 to-green-50 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav class="text-sm text-gray-600 mb-4">
-                <a href="{{ route('home') }}" class="hover:text-green-600 transition">Accueil</a>
-                <span class="mx-2">/</span>
-                <span class="text-green-600 font-semibold">Catégories</span>
-            </nav>
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Nos Catégories</h1>
-            <p class="text-gray-600 text-base sm:text-lg">
-                Découvrez notre gamme complète de produits organisés par catégories
-            </p>
+<div class="bg-gradient-to-b from-gray-50 via-white to-gray-50 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {{-- Fil d’Ariane --}}
+        <nav class="flex mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{{ route('home') }}" class="inline-flex items-center text-gray-500 hover:text-blue-600">
+                        <span class="mr-1">🏠</span> Accueil
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <span class="mx-2 text-gray-400">/</span>
+                        <span class="text-gray-700 font-medium">Catégories</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        {{-- Header --}}
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold font-montserrat text-gray-900 tracking-tight flex items-center">
+                    <span class="mr-3 text-3xl">📂</span>
+                    Nos catégories de produits
+                </h1>
+                <p class="mt-3 text-base text-gray-600 max-w-2xl">
+                    Découvrez notre gamme complète de produits organisés par catégories pour répondre à tous vos besoins en énergie et équipements.
+                </p>
+            </div>
+
+            <div class="flex flex-col items-start md:items-end gap-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold uppercase tracking-wider">
+                    🔋 Énergie solaire & équipements
+                </span>
+                <p class="text-xs text-gray-500">
+                    Produits de dernière génération avec rendement optimal, installation professionnelle et suivi personnalisé.
+                </p>
+            </div>
         </div>
-    </section>
 
-    {{-- Section Pourquoi choisir --}}
-    <section class="py-12 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-10">
-                Pourquoi choisir nos produits ?
-            </h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {{-- Haute Performance --}}
-                <div class="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-lg hover:shadow-lg transition transform hover:scale-105">
-                    <div class="bg-green-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 mb-2">Haute Performance</h3>
-                    <p class="text-gray-600 text-sm">
-                        Produits de dernière génération avec rendement optimal
+        {{-- Stats / Avantages --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-xl">⚡</div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900">Performance garantie</h3>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Produits de dernière génération avec rendement optimal et certification internationale.
                     </p>
                 </div>
-
-                {{-- Garantie Étendue --}}
-                <div class="text-center p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg hover:shadow-lg transition transform hover:scale-105">
-                    <div class="bg-orange-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 mb-2">Garantie Étendue</h3>
-                    <p class="text-gray-600 text-sm">
-                        Garantie constructeur jusqu'à 25 ans sur certains produits
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-xl">🌱</div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900">Énergie propre</h3>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Solutions respectueuses de l'environnement pour réduire durablement votre empreinte carbone.
                     </p>
                 </div>
-
-                {{-- Écologique --}}
-                <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg hover:shadow-lg transition transform hover:scale-105">
-                    <div class="bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 mb-2">Écologique</h3>
-                    <p class="text-gray-600 text-sm">
-                        Solutions respectueuses de l'environnement
-                    </p>
-                </div>
-
-                {{-- Économique --}}
-                <div class="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-100 rounded-lg hover:shadow-lg transition transform hover:scale-105">
-                    <div class="bg-emerald-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 mb-2">Économique</h3>
-                    <p class="text-gray-600 text-sm">
-                        Réduction significative de vos factures
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-xl">💰</div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900">Économies assurées</h3>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Réduction significative de vos factures d'électricité grâce à nos solutions solaires.
                     </p>
                 </div>
             </div>
         </div>
-    </section>
 
-    {{-- Liste des catégories --}}
-    <section class="py-12 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            @if($categories->count() > 0)
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($categories as $category)
-                        <a href="{{ route('categories.show', $category->id) }}" 
-                           class="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1">
+        @if($categories->count())
+            {{-- Grille des catégories --}}
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                @foreach($categories as $category)
+                    <a href="{{ route('categories.show', $category->slug) }}"
+                       class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <div class="relative h-40 bg-gray-100 overflow-hidden">
                             @if($category->image)
-                                <div class="h-48 overflow-hidden bg-gray-100">
-                                    <img src="{{ asset('storage/' . $category->image) }}" 
-                                         alt="{{ $category->name }}"
-                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                                </div>
+                                <img src="{{ $category->image_url }}"
+                                     alt="{{ $category->name }}"
+                                     class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-200">
                             @else
-                                <div class="h-48 bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-                                    <span class="text-white text-5xl font-bold">{{ substr($category->name, 0, 2) }}</span>
+                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
+                                    <span class="text-4xl">📁</span>
                                 </div>
                             @endif
-                            <div class="p-6">
-                                <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition">
-                                    {{ $category->name }}
-                                </h3>
-                                <p class="text-gray-600 text-sm mb-4 line-clamp-2">
-                                    {{ $category->description ?? 'Découvrez nos produits dans cette catégorie' }}
-                                </p>
-                                <div class="flex items-center justify-between">
-                                    <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
-                                        {{ $category->products_count ?? 0 }} produit(s)
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-white/90 text-gray-800">
+                                    {{ $category->products_count ?? $category->products()->count() }} produit(s)
+                                </span>
+                                @if($category->is_featured)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-yellow-400 text-yellow-900 shadow-sm">
+                                        ⭐ Populaire
                                     </span>
-                                    <span class="inline-flex items-center text-green-600 font-semibold text-sm group-hover:gap-2 transition-all">
-                                        Voir
-                                        <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                        </svg>
-                                    </span>
-                                </div>
+                                @endif
                             </div>
-                        </a>
-                    @endforeach
-                </div>
+                        </div>
 
-                {{-- Pagination --}}
-                @if($categories->hasPages())
-                    <div class="mt-10">
-                        {{ $categories->links() }}
+                        <div class="p-5">
+                            <h2 class="text-base font-bold text-gray-900 mb-1 flex items-center">
+                                <span class="mr-2 text-lg">🔹</span>
+                                {{ $category->name }}
+                            </h2>
+                            <p class="text-xs text-gray-600 line-clamp-2 mb-3">
+                                {{ $category->description ?? 'Découvrez nos produits dans cette catégorie' }}
+                            </p>
+                            <div class="flex items-center justify-between text-xs text-gray-400">
+                                <span class="inline-flex items-center">
+                                    <span class="mr-1">➜</span>
+                                    Voir les produits
+                                </span>
+                                <span class="inline-flex items-center">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2"></span>
+                                    Disponible
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+
+            {{-- Pas de pagination ici car $categories est une collection simple --}}
+        @else
+            {{-- Message si aucune catégorie --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-dashed border-gray-200 py-16 px-6 text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl">
+                        📂
                     </div>
-                @endif
-            @else
-                <div class="text-center py-12 bg-white rounded-lg">
-                    <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                    </svg>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucune catégorie disponible</h3>
-                    <p class="text-gray-600 mb-6">Nos catégories seront bientôt disponibles</p>
-                    <a href="{{ route('home') }}" 
-                       class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition transform hover:scale-105">
-                        Retour à l'accueil
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">
+                    Aucune catégorie disponible pour le moment
+                </h2>
+                <p class="text-sm text-gray-500 mb-6 max-w-md mx-auto">
+                    Nos catégories seront bientôt disponibles. En attendant, vous pouvez parcourir nos produits principaux ou contacter notre équipe pour un accompagnement personnalisé.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <a href="{{ route('products.index') }}"
+                       class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors">
+                        <span class="mr-2">🛒</span> Voir tous les produits
+                    </a>
+                    <a href="{{ route('home') }}"
+                       class="inline-flex items-center px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold hover:bg-gray-200 transition-colors">
+                        ← Retour à l'accueil
                     </a>
                 </div>
-            @endif
-        </div>
-    </section>
+            </div>
+        @endif
 
-    {{-- CTA Contact --}}
-    <section class="py-12 bg-gradient-to-r from-green-600 to-blue-600 text-white">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-2xl sm:text-3xl font-bold mb-4">Besoin de conseils ?</h2>
-            <p class="text-lg mb-6 text-blue-100">
-                Nos experts sont à votre écoute pour vous guider dans le choix de vos équipements solaires
-            </p>
-            <div class="flex flex-wrap gap-4 justify-center">
-                <a href="tel:+22677126519" 
-                   class="bg-white text-green-600 hover:bg-gray-100 font-bold px-6 py-3 rounded-lg shadow-lg transition transform hover:scale-105">
-                    📞 Appeler +226 77 12 65 19
+        {{-- Bloc d’aide --}}
+        <div class="mt-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl px-6 py-6 flex flex-col md:flex-row items-center justify-between text-white shadow-lg">
+            <div class="flex items-center mb-4 md:mb-0">
+                <div class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center mr-4 text-2xl">
+                    ☎️
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold">Besoin d’aide pour choisir la bonne catégorie ?</h3>
+                    <p class="text-xs text-blue-100">
+                        Nos experts sont à votre écoute pour vous guider dans le choix de vos équipements solaires.
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="tel:+22665033700"
+                   class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white text-blue-700 text-sm font-semibold shadow-sm hover:bg-blue-50 transition-colors">
+                    <span class="mr-2">📞</span> Appeler un conseiller
                 </a>
-                <a href="https://wa.me/22663952032" 
+                <a href="https://wa.me/22665033700"
                    target="_blank"
-                   class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-3 rounded-lg shadow-lg transition transform hover:scale-105">
-                    💬 WhatsApp +226 63 95 20 32
+                   class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-emerald-500 text-white text-sm font-semibold shadow-sm hover:bg-emerald-400 transition-colors">
+                    <span class="mr-2">💬</span> Discuter sur WhatsApp
                 </a>
             </div>
         </div>
-    </section>
+    </div>
+</div>
 @endsection

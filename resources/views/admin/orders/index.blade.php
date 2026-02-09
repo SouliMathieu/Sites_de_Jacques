@@ -12,7 +12,7 @@
                 <p class="text-gray-600 mt-1">Gérez toutes les commandes de votre boutique Jackson Energy</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="exportOrders()" 
+                <button onclick="exportOrders()"
                         class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all">
                     <span class="mr-2">📥</span> Exporter
                 </button>
@@ -65,7 +65,9 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-xs font-medium text-gray-600 uppercase">Revenu total</p>
-                    <p class="text-xl font-bold text-emerald-600">{{ number_format(\App\Models\Order::where('payment_status', 'paid')->sum('total_amount'), 0, ',', ' ') }} F</p>
+                    <p class="text-xl font-bold text-emerald-600">
+                        {{ number_format(\App\Models\Order::where('payment_status', 'paid')->sum('total_amount'), 0, ',', ' ') }} F
+                    </p>
                 </div>
             </div>
         </div>
@@ -77,45 +79,61 @@
             <form method="GET" action="{{ route('admin.orders.index') }}" class="flex flex-wrap gap-4">
                 <div class="flex-1 min-w-[250px]">
                     <div class="relative">
-                        <input type="text"
-                               name="search"
-                               value="{{ request('search') }}"
-                               placeholder="🔍 Rechercher par numéro, client..."
-                               class="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="🔍 Rechercher par numéro, client..."
+                            class="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        >
                         @if(request('search'))
-                            <button type="button" onclick="this.previousElementSibling.value=''; this.closest('form').submit();"
-                                    class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                            <button
+                                type="button"
+                                onclick="this.previousElementSibling.value=''; this.closest('form').submit();"
+                                class="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                            >
                                 ✕
                             </button>
                         @endif
                     </div>
                 </div>
-                
-                <select name="status" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+
+                <select
+                    name="status"
+                    class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
                     <option value="">📦 Tous les statuts</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>⏳ En attente</option>
-                    <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>✅ Confirmée</option>
+                    <option value="pending"    {{ request('status') == 'pending' ? 'selected' : '' }}>⏳ En attente</option>
+                    <option value="confirmed"  {{ request('status') == 'confirmed' ? 'selected' : '' }}>✅ Confirmée</option>
                     <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>🔄 En traitement</option>
-                    <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>🚚 Expédiée</option>
-                    <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>📦 Livrée</option>
-                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>✅ Complétée</option>
-                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>❌ Annulée</option>
+                    <option value="shipped"    {{ request('status') == 'shipped' ? 'selected' : '' }}>🚚 Expédiée</option>
+                    <option value="delivered"  {{ request('status') == 'delivered' ? 'selected' : '' }}>📦 Livrée</option>
+                    <option value="completed"  {{ request('status') == 'completed' ? 'selected' : '' }}>✅ Complétée</option>
+                    <option value="cancelled"  {{ request('status') == 'cancelled' ? 'selected' : '' }}>❌ Annulée</option>
                 </select>
 
-                <select name="payment_status" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                <select
+                    name="payment_status"
+                    class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
                     <option value="">💳 Paiement</option>
                     <option value="pending" {{ request('payment_status') == 'pending' ? 'selected' : '' }}>⏳ En attente</option>
-                    <option value="paid" {{ request('payment_status') == 'paid' ? 'selected' : '' }}>✅ Payé</option>
-                    <option value="failed" {{ request('payment_status') == 'failed' ? 'selected' : '' }}>❌ Échoué</option>
+                    <option value="paid"    {{ request('payment_status') == 'paid' ? 'selected' : '' }}>✅ Payé</option>
+                    <option value="failed"  {{ request('payment_status') == 'failed' ? 'selected' : '' }}>❌ Échoué</option>
                 </select>
-                
-                <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all">
+
+                <button
+                    type="submit"
+                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all"
+                >
                     Filtrer
                 </button>
-                
+
                 @if(request()->hasAny(['search', 'status', 'payment_status']))
-                    <a href="{{ route('admin.orders.index') }}" 
-                       class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all">
+                    <a
+                        href="{{ route('admin.orders.index') }}"
+                        class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow hover:shadow-lg transition-all"
+                    >
                         Réinitialiser
                     </a>
                 @endif
@@ -155,7 +173,7 @@
                                     </div>
                                 </div>
                             </td>
-                            
+
                             <td class="px-6 py-4">
                                 <div class="text-sm font-semibold text-gray-900">{{ $order->customer_name }}</div>
                                 <div class="text-xs text-gray-500 mt-1 flex items-center">
@@ -167,7 +185,7 @@
                                     {{ $order->customer_phone }}
                                 </div>
                             </td>
-                            
+
                             <td class="px-6 py-4">
                                 <div class="text-sm">
                                     @foreach($order->orderItems->take(2) as $item)
@@ -185,55 +203,55 @@
                                     @endif
                                 </div>
                             </td>
-                            
+
                             <td class="px-6 py-4">
                                 <div class="text-base font-bold text-green-600">
                                     {{ number_format($order->total_amount, 0, ',', ' ') }} F
                                 </div>
                             </td>
-                            
+
                             <td class="px-6 py-4">
                                 <div class="space-y-2">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold
                                         @switch($order->status)
-                                            @case('pending') bg-yellow-100 text-yellow-800 @break
-                                            @case('confirmed') bg-blue-100 text-blue-800 @break
+                                            @case('pending')    bg-yellow-100 text-yellow-800 @break
+                                            @case('confirmed')  bg-blue-100 text-blue-800 @break
                                             @case('processing') bg-indigo-100 text-indigo-800 @break
-                                            @case('shipped') bg-purple-100 text-purple-800 @break
-                                            @case('delivered') bg-green-100 text-green-800 @break
-                                            @case('completed') bg-emerald-100 text-emerald-800 @break
-                                            @case('cancelled') bg-red-100 text-red-800 @break
-                                            @default bg-gray-100 text-gray-800
+                                            @case('shipped')    bg-purple-100 text-purple-800 @break
+                                            @case('delivered')  bg-green-100 text-green-800 @break
+                                            @case('completed')  bg-emerald-100 text-emerald-800 @break
+                                            @case('cancelled')  bg-red-100 text-red-800 @break
+                                            @default            bg-gray-100 text-gray-800
                                         @endswitch">
                                         @switch($order->status)
-                                            @case('pending') ⏳ En attente @break
-                                            @case('confirmed') ✅ Confirmée @break
+                                            @case('pending')    ⏳ En attente @break
+                                            @case('confirmed')  ✅ Confirmée @break
                                             @case('processing') 🔄 En traitement @break
-                                            @case('shipped') 🚚 Expédiée @break
-                                            @case('delivered') 📦 Livrée @break
-                                            @case('completed') ✅ Complétée @break
-                                            @case('cancelled') ❌ Annulée @break
+                                            @case('shipped')    🚚 Expédiée @break
+                                            @case('delivered')  📦 Livrée @break
+                                            @case('completed')  ✅ Complétée @break
+                                            @case('cancelled')  ❌ Annulée @break
                                             @default {{ ucfirst($order->status) }}
                                         @endswitch
                                     </span>
-                                    
+
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold
                                         @switch($order->payment_status)
                                             @case('pending') bg-yellow-100 text-yellow-800 @break
-                                            @case('paid') bg-green-100 text-green-800 @break
-                                            @case('failed') bg-red-100 text-red-800 @break
-                                            @default bg-gray-100 text-gray-800
+                                            @case('paid')    bg-green-100 text-green-800 @break
+                                            @case('failed')  bg-red-100 text-red-800 @break
+                                            @default         bg-gray-100 text-gray-800
                                         @endswitch">
                                         @switch($order->payment_status)
                                             @case('pending') 💳 En attente @break
-                                            @case('paid') ✅ Payé @break
-                                            @case('failed') ❌ Échoué @break
+                                            @case('paid')    ✅ Payé @break
+                                            @case('failed')  ❌ Échoué @break
                                             @default {{ ucfirst($order->payment_status) }}
                                         @endswitch
                                     </span>
                                 </div>
                             </td>
-                            
+
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-900 font-medium">
                                     {{ $order->created_at->format('d/m/Y') }}
@@ -245,19 +263,33 @@
                                     {{ $order->created_at->diffForHumans() }}
                                 </div>
                             </td>
-                            
+
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-end gap-3">
-                                    <a href="{{ route('admin.orders.show', $order) }}"
-                                       class="text-blue-600 hover:text-blue-800 transition transform hover:scale-110"
-                                       title="Voir les détails">
+                                    <a
+                                        href="{{ route('admin.orders.show', $order) }}"
+                                        class="text-blue-600 hover:text-blue-800 transition transform hover:scale-110"
+                                        title="Voir les détails"
+                                    >
                                         <span class="text-xl">👁️</span>
                                     </a>
 
-                                    <button type="button"
-                                            onclick="confirmDeleteOrder({{ $order->id }}, '{{ addslashes($order->order_number) }}')"
-                                            class="text-red-600 hover:text-red-800 transition transform hover:scale-110"
-                                            title="Supprimer la commande">
+                                    {{-- Nouveau : bouton pour imprimer le reçu --}}
+                                    <a
+                                        href="{{ route('admin.orders.receipt', $order) }}"
+                                        class="text-purple-600 hover:text-purple-800 transition transform hover:scale-110"
+                                        title="Imprimer le reçu"
+                                        target="_blank"
+                                    >
+                                        <span class="text-xl">🧾</span>
+                                    </a>
+
+                                    <button
+                                        type="button"
+                                        onclick="confirmDeleteOrder({{ $order->id }}, '{{ addslashes($order->order_number) }}')"
+                                        class="text-red-600 hover:text-red-800 transition transform hover:scale-110"
+                                        title="Supprimer la commande"
+                                    >
                                         <span class="text-xl">🗑️</span>
                                     </button>
                                 </div>
@@ -271,8 +303,10 @@
                                     <p class="text-xl text-gray-500 font-semibold mb-2">Aucune commande trouvée</p>
                                     <p class="text-sm text-gray-400 mb-4">Les commandes apparaîtront ici</p>
                                     @if(request()->hasAny(['search', 'status', 'payment_status']))
-                                        <a href="{{ route('admin.orders.index') }}" 
-                                           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
+                                        <a
+                                            href="{{ route('admin.orders.index') }}"
+                                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+                                        >
                                             Réinitialiser les filtres
                                         </a>
                                     @endif
@@ -293,7 +327,10 @@
     @endif
 
     {{-- Modal de suppression --}}
-    <div id="deleteOrderModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div
+        id="deleteOrderModal"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4"
+    >
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full transform transition-all">
             <div class="p-6">
                 <div class="flex justify-center mb-4">
@@ -316,16 +353,20 @@
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <button type="button"
-                            onclick="closeDeleteOrderModal()"
-                            class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-lg transition">
+                    <button
+                        type="button"
+                        onclick="closeDeleteOrderModal()"
+                        class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-lg transition"
+                    >
                         Annuler
                     </button>
                     <form id="deleteOrderForm" method="POST" class="flex-1">
                         @csrf
                         @method('DELETE')
-                        <button type="submit"
-                                class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition">
+                        <button
+                            type="submit"
+                            class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition"
+                        >
                             Supprimer définitivement
                         </button>
                     </form>
@@ -348,7 +389,7 @@ function closeDeleteOrderModal() {
 }
 
 // Fermer modal en cliquant à l'extérieur
-document.getElementById('deleteOrderModal')?.addEventListener('click', function(e) {
+document.getElementById('deleteOrderModal')?.addEventListener('click', function (e) {
     if (e.target === this) {
         closeDeleteOrderModal();
     }
@@ -357,7 +398,7 @@ document.getElementById('deleteOrderModal')?.addEventListener('click', function(
 // Export des commandes (placeholder)
 function exportOrders() {
     if (window.showAdminNotification) {
-        window.showAdminNotification('Fonctionnalité d\'export en développement', 'info');
+        window.showAdminNotification("Fonctionnalité d'export en développement", 'info');
     } else {
         alert('ℹ️ Fonctionnalité d\'export en développement');
     }

@@ -104,9 +104,31 @@
                         <div class="products-grid">
                             @foreach($products as $product)
                                 <div class="product-card">
-                                    {{-- Image --}}
+                                    {{-- Image ou Vidéo avec lecture au survol --}}
                                     <a href="{{ route('products.show', $product->slug) }}" class="product-card__image-link">
-                                        @if($product->first_image)
+                                        @if($product->videos_count > 0 && $product->first_video)
+                                            {{-- Afficher la vidéo si disponible --}}
+                                            <div class="product-card__image-wrapper" style="position: relative;">
+                                                <video
+                                                    src="{{ $product->first_video }}"
+                                                    class="product-card__video"
+                                                    muted
+                                                    loop
+                                                    playsinline
+                                                    preload="metadata"
+                                                    onmouseenter="this.play()"
+                                                    onmouseleave="this.pause(); this.currentTime=0;"
+                                                    style="width: 100%; height: 100%; object-fit: cover;"
+                                                >
+                                                </video>
+                                                {{-- Badge vidéo --}}
+                                                <span class="product-card__video-badge" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; display: flex; align-items: center; gap: 4px; z-index: 10;">
+                                                    <span style="font-size: 16px;">▶️</span>
+                                                    <span>Vidéo</span>
+                                                </span>
+                                            </div>
+                                        @elseif($product->first_image)
+                                            {{-- Afficher l'image si pas de vidéo --}}
                                             <div class="product-card__image-wrapper">
                                                 <img
                                                     src="{{ $product->first_image }}"
@@ -115,6 +137,7 @@
                                                 >
                                             </div>
                                         @else
+                                            {{-- Placeholder si ni vidéo ni image --}}
                                             <div class="product-card__image-placeholder">
                                                 <span class="product-card__image-placeholder-icon">📦</span>
                                             </div>

@@ -42,12 +42,26 @@
                 {{-- Colonne gauche : médias --}}
                 <div class="product-media">
                     <div class="product-media__main">
-                        @if($product->images_count > 0)
+                        {{-- Affichage de la vidéo si disponible --}}
+                        @if($product->videos_count > 0 && $product->first_video)
+                            <div class="product-media__video-wrapper" id="product-main-media">
+                                <video
+                                    src="{{ $product->first_video }}"
+                                    class="product-media__main-video"
+                                    controls
+                                    preload="metadata"
+                                    playsinline
+                                    style="width: 100%; height: auto; max-height: 600px; object-fit: contain; background: #000;"
+                                >
+                                    Votre navigateur ne supporte pas la lecture de vidéos.
+                                </video>
+                            </div>
+                        @elseif($product->images_count > 0)
                             <img
                                 src="{{ $product->first_image }}"
                                 alt="{{ $product->name }}"
                                 class="product-media__main-image"
-                                id="product-main-image"
+                                id="product-main-media"
                             >
                         @else
                             <div class="product-media__placeholder">
@@ -63,13 +77,29 @@
                         @endif
                     </div>
 
-                    @if($product->images_count > 1)
+                    {{-- Miniatures des images ET vidéos --}}
+                    @if($product->images_count > 0 || $product->videos_count > 0)
                         <div class="product-thumbs">
+                            {{-- Miniatures des vidéos en premier --}}
+                            @foreach($product->video_urls as $index => $videoUrl)
+                                <button
+                                    type="button"
+                                    class="product-thumbs__item {{ $index === 0 && $product->videos_count > 0 ? 'product-thumbs__item--active' : '' }}"
+                                    onclick="changeProductMedia('{{ $videoUrl }}', 'video', {{ $index }})"
+                                >
+                                    <div class="product-thumbs__video-indicator" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f3f4f6; border-radius: 4px;">
+                                        <span style="font-size: 24px;">▶️</span>
+                                        <span style="font-size: 10px; color: #666;">Vidéo {{ $index + 1 }}</span>
+                                    </div>
+                                </button>
+                            @endforeach
+
+                            {{-- Miniatures des images --}}
                             @foreach($product->image_urls as $index => $imageUrl)
                                 <button
                                     type="button"
-                                    class="product-thumbs__item {{ $index === 0 ? 'product-thumbs__item--active' : '' }}"
-                                    onclick="changeProductImage('{{ $imageUrl }}', {{ $index }})"
+                                    class="product-thumbs__item {{ $product->videos_count === 0 && $index === 0 ? 'product-thumbs__item--active' : '' }}"
+                                    onclick="changeProductMedia('{{ $imageUrl }}', 'image', {{ $index + $product->videos_count }})"
                                 >
                                     <img
                                         src="{{ $imageUrl }}"
@@ -258,11 +288,39 @@
     </section>
 
     <script>
-        function changeProductImage(url, index) {
-            const main = document.getElementById('product-main-image');
-            if (!main) return;
-            main.src = url;
+        /**
+         * Changer le média principal (image ou vidéo)
+         * @param {string} url - URL du média
+         * @param {string} type - Type de média ('image' ou 'video')
+         * @param {number} index - Index du média
+         */
+        function changeProductMedia(url, type, index) {
+            const container = document.getElementById('product-main-media');
+            if (!container) return;
 
+            // Supprimer le contenu actuel
+            container.innerHTML = '';
+
+            if (type === 'video') {
+                // Créer un élément vidéo
+                const video = document.createElement('video');
+                video.src = url;
+                video.controls = true;
+                video.preload = 'metadata';
+                video.playsinline = true;
+                video.style.cssText = 'width: 100%; height: auto; max-height: 600px; object-fit: contain; background: #000;';
+                video.className = 'product-media__main-video';
+                container.appendChild(video);
+            } else {
+                // Créer un élément image
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Produit';
+                img.className = 'product-media__main-image';
+                container.appendChild(img);
+            }
+
+            // Mettre à jour les miniatures actives
             const items = document.querySelectorAll('.product-thumbs__item');
             items.forEach((btn, i) => {
                 if (i === index) {

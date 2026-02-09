@@ -17,7 +17,7 @@
     </div>
 
     <div class="bg-white rounded-lg shadow-lg">
-        <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data" class="p-8 space-y-8">
+        <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data" class="p-8 space-y-8" id="product-form">
             @csrf
             @method('PUT')
 
@@ -268,9 +268,9 @@
                     <div id="new-videos-preview" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
-                {{-- Champs cachés pour les suppressions --}}
-                <input type="hidden" name="remove_images" id="remove_images" value="">
-                <input type="hidden" name="remove_videos" id="remove_videos" value="">
+                {{-- ✅ CORRECTION: Champs cachés avec des tableaux dynamiques --}}
+                <div id="remove-images-container"></div>
+                <div id="remove-videos-container"></div>
             </div>
 
             {{-- Options --}}
@@ -347,7 +347,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Initialisation de l\'édition du produit...');
 
-    // Gestion des suppressions
+    // ✅ CORRECTION: Utiliser des tableaux au lieu de strings
     let imagesToRemove = [];
     let videosToRemove = [];
 
@@ -359,12 +359,17 @@ document.addEventListener('DOMContentLoaded', function() {
             imageContainer.style.filter = 'grayscale(100%)';
             imageContainer.style.pointerEvents = 'none';
             
-            imagesToRemove.push(imageIndex);
-            document.getElementById('remove_images').value = imagesToRemove.join(',');
+            // ✅ Ajouter à la liste
+            if (!imagesToRemove.includes(imageIndex)) {
+                imagesToRemove.push(imageIndex);
+            }
+            
+            // ✅ CORRECTION: Créer des champs cachés individuels
+            updateRemoveImagesFields();
             
             console.log('🗑️ Image marquée pour suppression:', imageIndex);
+            console.log('📋 Liste complète des images à supprimer:', imagesToRemove);
             
-            // Afficher une notification
             if (window.showAdminNotification) {
                 window.showAdminNotification('Image marquée pour suppression', 'warning');
             }
@@ -379,16 +384,54 @@ document.addEventListener('DOMContentLoaded', function() {
             videoContainer.style.filter = 'grayscale(100%)';
             videoContainer.style.pointerEvents = 'none';
             
-            videosToRemove.push(videoIndex);
-            document.getElementById('remove_videos').value = videosToRemove.join(',');
+            // ✅ Ajouter à la liste
+            if (!videosToRemove.includes(videoIndex)) {
+                videosToRemove.push(videoIndex);
+            }
+            
+            // ✅ CORRECTION: Créer des champs cachés individuels
+            updateRemoveVideosFields();
             
             console.log('🗑️ Vidéo marquée pour suppression:', videoIndex);
+            console.log('📋 Liste complète des vidéos à supprimer:', videosToRemove);
             
             if (window.showAdminNotification) {
                 window.showAdminNotification('Vidéo marquée pour suppression', 'warning');
             }
         }
     };
+
+    // ✅ NOUVELLE FONCTION: Créer des champs cachés pour chaque image à supprimer
+    function updateRemoveImagesFields() {
+        const container = document.getElementById('remove-images-container');
+        container.innerHTML = '';
+        
+        imagesToRemove.forEach(function(index) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'remove_images[]';  // ✅ Nom de champ array
+            input.value = index;
+            container.appendChild(input);
+        });
+        
+        console.log('✅ Champs de suppression d\'images mis à jour:', imagesToRemove);
+    }
+
+    // ✅ NOUVELLE FONCTION: Créer des champs cachés pour chaque vidéo à supprimer
+    function updateRemoveVideosFields() {
+        const container = document.getElementById('remove-videos-container');
+        container.innerHTML = '';
+        
+        videosToRemove.forEach(function(index) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'remove_videos[]';  // ✅ Nom de champ array
+            input.value = index;
+            container.appendChild(input);
+        });
+        
+        console.log('✅ Champs de suppression de vidéos mis à jour:', videosToRemove);
+    }
 
     // Prévisualisation nouvelles images
     const newImagesInput = document.getElementById('new_images');
@@ -457,12 +500,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Validation avant soumission
-    const form = document.querySelector('form');
+    const form = document.getElementById('product-form');
     if (form) {
         form.addEventListener('submit', function(e) {
-            console.log(`📋 Modifications en cours...`);
-            console.log(`🗑️ ${imagesToRemove.length} image(s) à supprimer`);
-            console.log(`🗑️ ${videosToRemove.length} vidéo(s) à supprimer`);
+            console.log('========================================');
+            console.log('📋 SOUMISSION DU FORMULAIRE');
+            console.log('========================================');
+            console.log('🗑️ Images à supprimer:', imagesToRemove);
+            console.log('🗑️ Vidéos à supprimer:', videosToRemove);
+            console.log('📸 Nouvelles images:', newImagesInput.files.length);
+            console.log('🎥 Nouvelles vidéos:', newVideosInput.files.length);
+            console.log('========================================');
             
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {

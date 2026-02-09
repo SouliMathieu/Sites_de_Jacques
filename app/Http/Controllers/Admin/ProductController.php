@@ -17,9 +17,6 @@ class ProductController extends Controller
 {
     /**
      * Afficher la liste des produits
-     *
-     * @param Request $request
-     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
@@ -110,8 +107,6 @@ class ProductController extends Controller
 
     /**
      * Afficher le formulaire de création
-     *
-     * @return \Illuminate\View\View
      */
     public function create()
     {
@@ -124,9 +119,6 @@ class ProductController extends Controller
 
     /**
      * Enregistrer un nouveau produit
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -171,12 +163,6 @@ class ProductController extends Controller
                 $slug = $originalSlug . '-' . $counter;
                 $counter++;
             }
-
-            Log::info('Création produit - Début', [
-                'name' => $validated['name'],
-                'has_images' => $request->hasFile('images'),
-                'has_videos' => $request->hasFile('videos'),
-            ]);
 
             // Upload des images
             $imageNames = [];
@@ -224,71 +210,28 @@ class ProductController extends Controller
             ]);
 
             DB::commit();
-
-            // Vider le cache
             Cache::forget('products.featured.random');
 
-            Log::info('Produit créé avec succès', [
+            Log::info('Produit créé', [
                 'product_id' => $product->id,
                 'name' => $product->name,
                 'images_count' => count($imageNames),
                 'videos_count' => count($videoNames),
-                'user_id' => auth()->id(),
             ]);
 
             return redirect()
                 ->route('admin.products.index')
-                ->with('success', "Produit \"{$product->name}\" créé avec succès ! ({$product->images_count} image(s), {$product->videos_count} vidéo(s))");
+                ->with('success', "Produit \"{$product->name}\" créé avec succès !");
 
         } catch (\Exception $e) {
             DB::rollBack();
-
-            // Supprimer les fichiers uploadés en cas d'erreur
-            foreach ($imageNames ?? [] as $imageName) {
-                Storage::disk('public')->delete("products/images/{$imageName}");
-            }
-            foreach ($videoNames ?? [] as $videoName) {
-                Storage::disk('public')->delete("products/videos/{$videoName}");
-            }
-
-            Log::error('Erreur création produit', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id(),
-            ]);
-
-            return back()
-                ->withInput()
-                ->with('error', 'Une erreur est survenue lors de la création du produit : ' . $e->getMessage());
+            Log::error('Erreur création produit', ['error' => $e->getMessage()]);
+            return back()->withInput()->with('error', 'Une erreur est survenue : ' . $e->getMessage());
         }
     }
 
     /**
-     * Afficher un produit
-     *
-     * @param Product $product
-     * @return \Illuminate\View\View
-     */
-    public function show(Product $product)
-    {
-        $product->load(['category', 'orderItems.order']);
-
-        // Statistiques du produit
-        $stats = [
-            'total_sold' => $product->orderItems()->sum('quantity'),
-            'total_revenue' => $product->orderItems()->sum('total_price'),
-            'orders_count' => $product->orderItems()->distinct('order_id')->count('order_id'),
-            'views_count' => $product->views_count ?? 0,
-        ];
-
-        return view('admin.products.show', compact('product', 'stats'));
-    }
-
-    /**
-     * Afficher le formulaire d'édition
-     *
-     * @param Product $product
-     * @return \Illuminate\View\View
+     * Afficher le formulaire de modification
      */
     public function edit(Product $product)
     {
@@ -300,17 +243,15 @@ class ProductController extends Controller
     }
 
     /**
-     * Mettre à jour un produit
-     *
-     * @param Request $request
-     * @param Product $product
-     * @return \Illuminate\Http\RedirectResponse
+     * Mettre à jour un produit existant
+     * 
+     * ⚠️ CORRECTION CRITIQUE: Gestion correcte de la suppression et ajout de médias
      */
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('products')->ignore($product->id)],
-            'slug' => ['nullable', 'string', 'max:255', Rule::unique('products')->ignore($product->id)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('products', 'slug')->ignore($product->id)],
             'description' => 'required|string',
             'specifications' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -320,91 +261,136 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'images.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
             'videos.*' => 'nullable|mimes:mp4,mov,avi,webm|max:51200',
-            'remove_images' => 'nullable|array',
-            'remove_images.*' => 'integer',
-            'remove_videos' => 'nullable|array',
-            'remove_videos.*' => 'integer',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords' => 'nullable|string|max:500',
+            'remove_images' => 'nullable|array',
+            'remove_videos' => 'nullable|array',
         ]);
 
         DB::beginTransaction();
 
         try {
-            // Générer le slug si le nom a changé
-            $slug = $product->slug;
-            if ($product->name !== $validated['name']) {
-                $slug = $validated['slug'] ?? Str::slug($validated['name']);
+            // Génération du slug unique si modifié
+            $slug = $validated['slug'] ?? Str::slug($validated['name']);
+            
+            if ($slug !== $product->slug) {
                 $originalSlug = $slug;
                 $counter = 1;
-
                 while (Product::where('slug', $slug)->where('id', '!=', $product->id)->exists()) {
                     $slug = $originalSlug . '-' . $counter;
                     $counter++;
                 }
             }
 
-            // Supprimer les images sélectionnées
+            Log::info('Mise à jour produit - Début', [
+                'product_id' => $product->id,
+                'remove_images' => $request->input('remove_images', []),
+                'remove_videos' => $request->input('remove_videos', []),
+                'new_images' => $request->hasFile('images'),
+                'new_videos' => $request->hasFile('videos'),
+            ]);
+
+            // ========================================
+            // 🔧 CORRECTION: Récupérer les médias ACTUELS une seule fois
+            // ========================================
+            $currentImages = $product->images ?? [];
+            $currentVideos = $product->videos ?? [];
+
+            // ========================================
+            // ÉTAPE 1: SUPPRIMER LES IMAGES SÉLECTIONNÉES
+            // ========================================
             if ($request->filled('remove_images')) {
-                $currentImages = $product->images ?? [];
                 foreach ($request->remove_images as $index) {
+                    $index = (int)$index; // Convertir en entier
+                    
                     if (isset($currentImages[$index])) {
                         $imagePath = $currentImages[$index];
-                        Storage::disk('public')->delete("products/images/{$imagePath}");
+                        $cleanImagePath = $this->cleanMediaPath($imagePath);
+                        
+                        // Supprimer le fichier physique
+                        Storage::disk('public')->delete("products/images/{$cleanImagePath}");
+                        
+                        // Retirer du tableau
                         unset($currentImages[$index]);
-                        Log::info('Image supprimée', ['filename' => $imagePath]);
+                        
+                        Log::info('Image supprimée', [
+                            'index' => $index,
+                            'original_path' => $imagePath,
+                            'cleaned_path' => $cleanImagePath,
+                        ]);
                     }
                 }
-                $product->update(['images' => array_values($currentImages)]);
-                $product->refresh();
+                
+                // Réindexer le tableau
+                $currentImages = array_values($currentImages);
             }
 
-            // Supprimer les vidéos sélectionnées
-            if ($request->filled('remove_videos')) {
-                $currentVideos = $product->videos ?? [];
-                foreach ($request->remove_videos as $index) {
-                    if (isset($currentVideos[$index])) {
-                        $videoPath = $currentVideos[$index];
-                        Storage::disk('public')->delete("products/videos/{$videoPath}");
-                        unset($currentVideos[$index]);
-                        Log::info('Vidéo supprimée', ['filename' => $videoPath]);
-                    }
-                }
-                $product->update(['videos' => array_values($currentVideos)]);
-                $product->refresh();
-            }
-
-            // Ajouter de nouvelles images
+            // ========================================
+            // ÉTAPE 2: AJOUTER LES NOUVELLES IMAGES
+            // ========================================
             if ($request->hasFile('images')) {
-                $currentImages = $product->images ?? [];
                 foreach ($request->file('images') as $index => $image) {
-                    $imageName = time() . '_' . (count($currentImages) + $index + 1) . '_' . Str::slug($validated['name']) . '.' . $image->getClientOriginalExtension();
+                    $imageName = time() . '_' . uniqid() . '_' . Str::slug($validated['name']) . '.' . $image->getClientOriginalExtension();
                     $image->storeAs('products/images', $imageName, 'public');
+                    
+                    // ✅ Ajouter au tableau existant
                     $currentImages[] = $imageName;
+                    
                     Log::info('Nouvelle image ajoutée', ['filename' => $imageName]);
                 }
-                $product->update(['images' => $currentImages]);
-                $product->refresh();
             }
 
-            // Ajouter de nouvelles vidéos
+            // ========================================
+            // ÉTAPE 3: SUPPRIMER LES VIDÉOS SÉLECTIONNÉES
+            // ========================================
+            if ($request->filled('remove_videos')) {
+                foreach ($request->remove_videos as $index) {
+                    $index = (int)$index; // Convertir en entier
+                    
+                    if (isset($currentVideos[$index])) {
+                        $videoPath = $currentVideos[$index];
+                        $cleanVideoPath = $this->cleanMediaPath($videoPath);
+                        
+                        // Supprimer le fichier physique
+                        Storage::disk('public')->delete("products/videos/{$cleanVideoPath}");
+                        
+                        // Retirer du tableau
+                        unset($currentVideos[$index]);
+                        
+                        Log::info('Vidéo supprimée', [
+                            'index' => $index,
+                            'original_path' => $videoPath,
+                            'cleaned_path' => $cleanVideoPath,
+                        ]);
+                    }
+                }
+                
+                // Réindexer le tableau
+                $currentVideos = array_values($currentVideos);
+            }
+
+            // ========================================
+            // ÉTAPE 4: AJOUTER LES NOUVELLES VIDÉOS
+            // ========================================
             if ($request->hasFile('videos')) {
-                $currentVideos = $product->videos ?? [];
                 foreach ($request->file('videos') as $index => $video) {
-                    $videoName = time() . '_video_' . (count($currentVideos) + $index + 1) . '_' . Str::slug($validated['name']) . '.' . $video->getClientOriginalExtension();
+                    $videoName = time() . '_video_' . uniqid() . '_' . Str::slug($validated['name']) . '.' . $video->getClientOriginalExtension();
                     $video->storeAs('products/videos', $videoName, 'public');
+                    
+                    // ✅ Ajouter au tableau existant
                     $currentVideos[] = $videoName;
+                    
                     Log::info('Nouvelle vidéo ajoutée', ['filename' => $videoName]);
                 }
-                $product->update(['videos' => $currentVideos]);
-                $product->refresh();
             }
 
-            // Mettre à jour les autres données
+            // ========================================
+            // ÉTAPE 5: METTRE À JOUR TOUT EN UNE SEULE FOIS
+            // ========================================
             $product->update([
                 'name' => $validated['name'],
                 'slug' => $slug,
@@ -415,6 +401,8 @@ class ProductController extends Controller
                 'stock_quantity' => $validated['stock_quantity'],
                 'warranty' => $validated['warranty'] ?? null,
                 'category_id' => $validated['category_id'],
+                'images' => $currentImages,  // ✅ Tableau mis à jour
+                'videos' => $currentVideos,  // ✅ Tableau mis à jour
                 'is_featured' => $request->boolean('is_featured', false),
                 'is_active' => $request->boolean('is_active', true),
                 'sort_order' => $validated['sort_order'] ?? 0,
@@ -424,28 +412,26 @@ class ProductController extends Controller
             ]);
 
             DB::commit();
-
             Cache::forget('products.featured.random');
 
-            Log::info('Produit mis à jour', [
+            Log::info('Produit mis à jour avec succès', [
                 'product_id' => $product->id,
-                'name' => $product->name,
-                'images_count' => $product->images_count,
-                'videos_count' => $product->videos_count,
-                'user_id' => auth()->id(),
+                'images_count' => count($currentImages),
+                'videos_count' => count($currentVideos),
+                'final_images' => $currentImages,
+                'final_videos' => $currentVideos,
             ]);
 
             return redirect()
                 ->route('admin.products.index')
-                ->with('success', "Produit \"{$product->name}\" mis à jour avec succès ! ({$product->images_count} image(s), {$product->videos_count} vidéo(s))");
+                ->with('success', "Produit \"{$product->name}\" mis à jour avec succès !");
 
         } catch (\Exception $e) {
             DB::rollBack();
-
             Log::error('Erreur mise à jour produit', [
                 'product_id' => $product->id,
                 'error' => $e->getMessage(),
-                'user_id' => auth()->id(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return back()
@@ -456,13 +442,9 @@ class ProductController extends Controller
 
     /**
      * Supprimer un produit
-     *
-     * @param Product $product
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Product $product)
     {
-        // Vérifier les commandes liées
         $orderItemsCount = $product->orderItems()->count();
         if ($orderItemsCount > 0) {
             return back()->with('error', "Impossible de supprimer ce produit car il est lié à {$orderItemsCount} commande(s).");
@@ -470,43 +452,23 @@ class ProductController extends Controller
 
         try {
             $productName = $product->name;
-            $imagesCount = $product->images_count;
-            $videosCount = $product->videos_count;
-
-            // Supprimer les médias
             $product->deleteAllMedia();
-
-            // Supprimer le produit
             $product->delete();
-
+            
             Cache::forget('products.featured.random');
-
-            Log::info('Produit supprimé', [
-                'name' => $productName,
-                'images_deleted' => $imagesCount,
-                'videos_deleted' => $videosCount,
-                'user_id' => auth()->id(),
-            ]);
 
             return redirect()
                 ->route('admin.products.index')
                 ->with('success', "Produit \"{$productName}\" supprimé avec succès !");
 
         } catch (\Exception $e) {
-            Log::error('Erreur suppression produit', [
-                'product_id' => $product->id,
-                'error' => $e->getMessage(),
-            ]);
-
+            Log::error('Erreur suppression produit', ['error' => $e->getMessage()]);
             return back()->with('error', 'Une erreur est survenue lors de la suppression.');
         }
     }
 
     /**
      * Basculer le statut actif/inactif
-     *
-     * @param Product $product
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function toggleStatus(Product $product)
     {
@@ -519,19 +481,14 @@ class ProductController extends Controller
 
     /**
      * Dupliquer un produit
-     *
-     * @param Product $product
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function duplicate(Product $product)
     {
         try {
             $newProduct = $product->duplicate();
-
             return redirect()
                 ->route('admin.products.edit', $newProduct)
-                ->with('success', 'Produit dupliqué avec succès ! Modifiez les informations.');
-
+                ->with('success', 'Produit dupliqué avec succès !');
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de la duplication.');
         }
@@ -539,13 +496,10 @@ class ProductController extends Controller
 
     /**
      * Export des produits en CSV
-     *
-     * @return \Illuminate\Http\Response
      */
     public function export()
     {
         $products = Product::with('category')->orderBy('name')->get();
-
         $csv = "ID,Nom,Catégorie,Prix,Prix promo,Stock,Statut,Vedette,Créé le\n";
 
         foreach ($products as $product) {
@@ -563,10 +517,22 @@ class ProductController extends Controller
         }
 
         $filename = 'produits_' . now()->format('Y-m-d_H-i-s') . '.csv';
-
         return response($csv, 200, [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ]);
+    }
+
+    /**
+     * Nettoyer un chemin de média (enlever les préfixes indésirables)
+     */
+    private function cleanMediaPath($path)
+    {
+        $cleanPath = str_replace(
+            ['products/', 'videos/', 'images/', '/videos/', '/images/', '/products/'],
+            '',
+            $path
+        );
+        return ltrim($cleanPath, '/');
     }
 }

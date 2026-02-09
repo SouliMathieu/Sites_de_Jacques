@@ -16,9 +16,6 @@ class CategoryController extends Controller
 {
     /**
      * Afficher la liste des catégories
-     *
-     * @param Request $request
-     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
@@ -77,12 +74,9 @@ class CategoryController extends Controller
 
     /**
      * Afficher le formulaire de création
-     *
-     * @return \Illuminate\View\View
      */
     public function create()
     {
-        // Catégories parentes pour hiérarchie (si vous l'utilisez)
         $parentCategories = Category::where('is_active', true)
             ->whereNull('parent_id')
             ->orderBy('name')
@@ -93,9 +87,8 @@ class CategoryController extends Controller
 
     /**
      * Enregistrer une nouvelle catégorie
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * 
+     * ✅ CORRECTION: Gère image_file ET image_url
      */
     public function store(Request $request)
     {
@@ -103,11 +96,13 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories,name',
             'slug' => 'nullable|string|max:255|unique:categories,slug',
             'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',  // ✅ image_file
+            'image_url' => 'nullable|url|max:500',  // ✅ image_url
             'icon' => 'nullable|string|max:100',
             'parent_id' => 'nullable|exists:categories,id',
             'sort_order' => 'nullable|integer|min:0|max:999',
             'is_active' => 'boolean',
+            'show_in_menu' => 'boolean',
             'is_featured' => 'boolean',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
@@ -115,17 +110,29 @@ class CategoryController extends Controller
         ], [
             'name.required' => 'Le nom de la catégorie est obligatoire.',
             'name.unique' => 'Une catégorie avec ce nom existe déjà.',
-            'image.image' => 'Le fichier doit être une image.',
-            'image.max' => 'L\'image ne doit pas dépasser 2 Mo.',
+            'image_file.image' => 'Le fichier doit être une image.',
+            'image_file.max' => 'L\'image ne doit pas dépasser 2 Mo.',
+            'image_url.url' => 'L\'URL de l\'image n\'est pas valide.',
         ]);
 
         DB::beginTransaction();
 
         try {
-            // Upload de l'image
+            // ✅ CORRECTION: Gérer image_file OU image_url
             $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('categories', 'public');
+            
+            if ($request->hasFile('image_file')) {
+                // Upload du fichier
+                $imageName = time() . '_' . Str::slug($validated['name']) . '.' . $request->file('image_file')->getClientOriginalExtension();
+                $request->file('image_file')->storeAs('categories', $imageName, 'public');
+                $imagePath = $imageName;
+                
+                Log::info('Image de catégorie uploadée', ['filename' => $imageName]);
+            } elseif ($request->filled('image_url')) {
+                // Utiliser l'URL directement
+                $imagePath = $validated['image_url'];
+                
+                Log::info('URL d\'image de catégorie utilisée', ['url' => $imagePath]);
             }
 
             // Créer la catégorie
@@ -138,21 +145,22 @@ class CategoryController extends Controller
                 'parent_id' => $validated['parent_id'] ?? null,
                 'sort_order' => $validated['sort_order'] ?? 0,
                 'is_active' => $request->boolean('is_active', true),
+                'show_in_menu' => $request->boolean('show_in_menu', true),
                 'is_featured' => $request->boolean('is_featured', false),
-                'meta_title' => $validated['meta_title'] ?? null,
+                'meta_title' => $validated['meta_title'] ?? $validated['name'],
                 'meta_description' => $validated['meta_description'] ?? null,
                 'meta_keywords' => $validated['meta_keywords'] ?? null,
             ]);
 
             DB::commit();
 
-            // Vider le cache
             Cache::forget('categories.index');
             Cache::forget('categories.with_counts');
 
             Log::info("Catégorie créée", [
                 'category_id' => $category->id,
                 'name' => $category->name,
+                'has_image' => !empty($imagePath),
                 'user_id' => auth()->id(),
             ]);
 
@@ -163,39 +171,35 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Supprimer l'image si uploadée
-            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+            // Supprimer l'image uploadée si erreur
+            if ($imagePath && !filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete('categories/' . $imagePath);
             }
 
             Log::error("Erreur création catégorie", [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'user_id' => auth()->id(),
             ]);
 
             return back()
                 ->withInput()
-                ->with('error', 'Une erreur est survenue lors de la création de la catégorie.');
+                ->with('error', 'Une erreur est survenue : ' . $e->getMessage());
         }
     }
 
     /**
      * Afficher une catégorie
-     *
-     * @param Category $category
-     * @return \Illuminate\View\View
      */
     public function show(Category $category)
     {
         $category->loadCount('products');
 
-        // Produits de la catégorie avec pagination
         $products = $category->products()
             ->with('category')
             ->latest()
             ->paginate(12);
 
-        // Statistiques de la catégorie
         $stats = [
             'total_products' => $category->products()->count(),
             'active_products' => $category->products()->where('is_active', true)->count(),
@@ -209,13 +213,9 @@ class CategoryController extends Controller
 
     /**
      * Afficher le formulaire d'édition
-     *
-     * @param Category $category
-     * @return \Illuminate\View\View
      */
     public function edit(Category $category)
     {
-        // Catégories parentes (exclure la catégorie actuelle et ses enfants)
         $parentCategories = Category::where('is_active', true)
             ->where('id', '!=', $category->id)
             ->whereNull('parent_id')
@@ -227,10 +227,8 @@ class CategoryController extends Controller
 
     /**
      * Mettre à jour une catégorie
-     *
-     * @param Request $request
-     * @param Category $category
-     * @return \Illuminate\Http\RedirectResponse
+     * 
+     * ✅ CORRECTION: Gère image_file ET image_url + suppression
      */
     public function update(Request $request, Category $category)
     {
@@ -238,11 +236,14 @@ class CategoryController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('categories')->ignore($category->id)],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('categories')->ignore($category->id)],
             'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',  // ✅ image_file
+            'image_url' => 'nullable|url|max:500',  // ✅ image_url
+            'remove_image' => 'boolean',  // ✅ Option de suppression
             'icon' => 'nullable|string|max:100',
             'parent_id' => 'nullable|exists:categories,id',
             'sort_order' => 'nullable|integer|min:0|max:999',
             'is_active' => 'boolean',
+            'show_in_menu' => 'boolean',
             'is_featured' => 'boolean',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
@@ -250,22 +251,50 @@ class CategoryController extends Controller
         ], [
             'name.required' => 'Le nom de la catégorie est obligatoire.',
             'name.unique' => 'Une catégorie avec ce nom existe déjà.',
-            'image.image' => 'Le fichier doit être une image.',
-            'image.max' => 'L\'image ne doit pas dépasser 2 Mo.',
+            'image_file.image' => 'Le fichier doit être une image.',
+            'image_file.max' => 'L\'image ne doit pas dépasser 2 Mo.',
+            'image_url.url' => 'L\'URL de l\'image n\'est pas valide.',
         ]);
 
         DB::beginTransaction();
 
         try {
-            // Upload de la nouvelle image
+            // ✅ CORRECTION: Gérer l'image correctement
             $imagePath = $category->image;
-            if ($request->hasFile('image')) {
-                // Supprimer l'ancienne image
-                if ($category->image && Storage::disk('public')->exists($category->image)) {
-                    Storage::disk('public')->delete($category->image);
+            
+            // Supprimer l'image si demandé
+            if ($request->boolean('remove_image')) {
+                if ($category->image && !filter_var($category->image, FILTER_VALIDATE_URL)) {
+                    Storage::disk('public')->delete('categories/' . $category->image);
                 }
-
-                $imagePath = $request->file('image')->store('categories', 'public');
+                $imagePath = null;
+                
+                Log::info('Image de catégorie supprimée', [
+                    'category_id' => $category->id,
+                ]);
+            }
+            
+            // Upload nouvelle image
+            if ($request->hasFile('image_file')) {
+                // Supprimer l'ancienne si ce n'est pas une URL
+                if ($category->image && !filter_var($category->image, FILTER_VALIDATE_URL)) {
+                    Storage::disk('public')->delete('categories/' . $category->image);
+                }
+                
+                $imageName = time() . '_' . Str::slug($validated['name']) . '.' . $request->file('image_file')->getClientOriginalExtension();
+                $request->file('image_file')->storeAs('categories', $imageName, 'public');
+                $imagePath = $imageName;
+                
+                Log::info('Nouvelle image de catégorie uploadée', ['filename' => $imageName]);
+            } elseif ($request->filled('image_url') && !$request->boolean('remove_image')) {
+                // Supprimer l'ancienne image fichier si on passe à une URL
+                if ($category->image && !filter_var($category->image, FILTER_VALIDATE_URL)) {
+                    Storage::disk('public')->delete('categories/' . $category->image);
+                }
+                
+                $imagePath = $validated['image_url'];
+                
+                Log::info('URL d\'image de catégorie utilisée', ['url' => $imagePath]);
             }
 
             // Mettre à jour la catégorie
@@ -278,21 +307,22 @@ class CategoryController extends Controller
                 'parent_id' => $validated['parent_id'] ?? null,
                 'sort_order' => $validated['sort_order'] ?? 0,
                 'is_active' => $request->boolean('is_active', true),
+                'show_in_menu' => $request->boolean('show_in_menu', true),
                 'is_featured' => $request->boolean('is_featured', false),
-                'meta_title' => $validated['meta_title'] ?? null,
+                'meta_title' => $validated['meta_title'] ?? $validated['name'],
                 'meta_description' => $validated['meta_description'] ?? null,
                 'meta_keywords' => $validated['meta_keywords'] ?? null,
             ]);
 
             DB::commit();
 
-            // Vider le cache
             Cache::forget('categories.index');
             Cache::forget('categories.with_counts');
 
             Log::info("Catégorie mise à jour", [
                 'category_id' => $category->id,
                 'name' => $category->name,
+                'image_changed' => $category->wasChanged('image'),
                 'user_id' => auth()->id(),
             ]);
 
@@ -306,29 +336,25 @@ class CategoryController extends Controller
             Log::error("Erreur mise à jour catégorie", [
                 'category_id' => $category->id,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'user_id' => auth()->id(),
             ]);
 
             return back()
                 ->withInput()
-                ->with('error', 'Une erreur est survenue lors de la mise à jour de la catégorie.');
+                ->with('error', 'Une erreur est survenue : ' . $e->getMessage());
         }
     }
 
     /**
      * Supprimer une catégorie
-     *
-     * @param Category $category
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Category $category)
     {
-        // Vérifier si la catégorie a des produits
         if ($category->products()->count() > 0) {
-            return back()->with('error', 'Impossible de supprimer une catégorie qui contient des produits. Veuillez d\'abord supprimer ou déplacer les produits.');
+            return back()->with('error', 'Impossible de supprimer une catégorie qui contient des produits.');
         }
 
-        // Vérifier si la catégorie a des sous-catégories
         if ($category->children()->count() > 0) {
             return back()->with('error', 'Impossible de supprimer une catégorie qui contient des sous-catégories.');
         }
@@ -336,15 +362,13 @@ class CategoryController extends Controller
         try {
             $categoryName = $category->name;
 
-            // Supprimer l'image
-            if ($category->image && Storage::disk('public')->exists($category->image)) {
-                Storage::disk('public')->delete($category->image);
+            // Supprimer l'image si ce n'est pas une URL
+            if ($category->image && !filter_var($category->image, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete('categories/' . $category->image);
             }
 
-            // Supprimer la catégorie
             $category->delete();
 
-            // Vider le cache
             Cache::forget('categories.index');
             Cache::forget('categories.with_counts');
 
@@ -361,29 +385,23 @@ class CategoryController extends Controller
             Log::error("Erreur suppression catégorie", [
                 'category_id' => $category->id,
                 'error' => $e->getMessage(),
-                'user_id' => auth()->id(),
             ]);
 
-            return back()->with('error', 'Une erreur est survenue lors de la suppression de la catégorie.');
+            return back()->with('error', 'Une erreur est survenue lors de la suppression.');
         }
     }
 
     /**
      * Basculer le statut actif/inactif
-     *
-     * @param Category $category
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function toggleStatus(Category $category)
     {
         try {
             $category->toggleStatus();
-
             Cache::forget('categories.index');
             Cache::forget('categories.with_counts');
 
             $status = $category->is_active ? 'activée' : 'désactivée';
-
             return back()->with('success', "Catégorie {$status} avec succès !");
 
         } catch (\Exception $e) {
@@ -398,15 +416,11 @@ class CategoryController extends Controller
 
     /**
      * Dupliquer une catégorie
-     *
-     * @param Category $category
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function duplicate(Category $category)
     {
         try {
             $newCategory = $category->duplicate();
-
             Cache::forget('categories.index');
             Cache::forget('categories.with_counts');
 
@@ -418,7 +432,7 @@ class CategoryController extends Controller
 
             return redirect()
                 ->route('admin.categories.edit', $newCategory)
-                ->with('success', 'Catégorie dupliquée avec succès ! Veuillez modifier les informations.');
+                ->with('success', 'Catégorie dupliquée avec succès !');
 
         } catch (\Exception $e) {
             Log::error("Erreur duplication catégorie", [
@@ -431,82 +445,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Supprimer l'image d'une catégorie
-     *
-     * @param Category $category
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function deleteImage(Category $category)
-    {
-        try {
-            if ($category->image && Storage::disk('public')->exists($category->image)) {
-                Storage::disk('public')->delete($category->image);
-            }
-
-            $category->update(['image' => null]);
-
-            return back()->with('success', 'Image supprimée avec succès !');
-
-        } catch (\Exception $e) {
-            Log::error("Erreur suppression image catégorie", [
-                'category_id' => $category->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->with('error', 'Une erreur est survenue.');
-        }
-    }
-
-    /**
-     * Réorganiser les catégories (drag & drop)
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function reorder(Request $request)
-    {
-        $request->validate([
-            'categories' => 'required|array',
-            'categories.*.id' => 'required|exists:categories,id',
-            'categories.*.sort_order' => 'required|integer|min:0',
-        ]);
-
-        try {
-            DB::beginTransaction();
-
-            foreach ($request->categories as $categoryData) {
-                Category::where('id', $categoryData['id'])
-                    ->update(['sort_order' => $categoryData['sort_order']]);
-            }
-
-            DB::commit();
-
-            Cache::forget('categories.index');
-            Cache::forget('categories.with_counts');
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Ordre des catégories mis à jour avec succès !',
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error("Erreur réorganisation catégories", [
-                'error' => $e->getMessage(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Une erreur est survenue.',
-            ], 500);
-        }
-    }
-
-    /**
      * Export des catégories en CSV
-     *
-     * @return \Illuminate\Http\Response
      */
     public function export()
     {
