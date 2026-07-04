@@ -417,7 +417,7 @@ class OrderController extends Controller
      */
     private function generateWhatsAppURL(Order $order, bool $isPaymentAtDelivery = false): string
     {
-        $whatsappNumber = '22665033700';
+        $whatsappNumber = \App\Models\SiteSetting::get('whatsapp', '22663952032');
 
         $message = $isPaymentAtDelivery
             ? $this->generateWhatsAppMessageForDelivery($order)

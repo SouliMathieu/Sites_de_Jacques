@@ -3,6 +3,13 @@
 @section('title', 'Commande confirmée - ' . $order->order_number)
 
 @section('content')
+@php
+    $phone    = \App\Models\SiteSetting::get('phone', '+226 77 12 65 19');
+    $whatsapp = \App\Models\SiteSetting::get('whatsapp', '22663952032');
+    $email    = \App\Models\SiteSetting::get('email', 'info@jacksonenergy.bf');
+    $telUrl   = 'tel:' . preg_replace('/\s+/', '', $phone);
+    $waUrl    = 'https://wa.me/' . $whatsapp;
+@endphp
 {{-- Hero Header Success --}}
 <div class="bg-gradient-to-r from-green-500 to-emerald-600 py-16">
     <div class="container mx-auto px-4">
@@ -416,7 +423,7 @@
                 </a>
 
                 @if($order->payment_status === 'pending' && $order->payment_method === 'bank_transfer')
-                <a href="mailto:contact@jacksonenergy.com?subject=Commande {{ $order->order_number }}&body=Bonjour,%0D%0A%0D%0AJe vous envoie le justificatif de paiement pour ma commande {{ $order->order_number }}.%0D%0A%0D%0AMontant: {{ number_format($order->total_amount, 0, ',', ' ') }} FCFA"
+                <a href="mailto:{{ $email }}?subject=Commande {{ $order->order_number }}&body=Bonjour,%0D%0A%0D%0AJe vous envoie le justificatif de paiement pour ma commande {{ $order->order_number }}.%0D%0A%0D%0AMontant: {{ number_format($order->total_amount, 0, ',', ' ') }} FCFA"
                    class="inline-flex items-center justify-center px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-lg rounded-lg shadow-md hover:shadow-xl transition-all">
                     <span class="mr-2">📧</span> Envoyer justificatif
                 </a>
@@ -426,11 +433,11 @@
             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
                 <p class="text-gray-700 mb-3 font-semibold">💬 Besoin d'aide ou d'informations ?</p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="tel:+22665033700" 
+                    <a href="{{ $telUrl }}"
                        class="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-blue-50 border-2 border-blue-300 text-blue-700 font-bold rounded-lg transition">
-                        <span class="mr-2">📞</span> +226 65 03 37 00
+                        <span class="mr-2">📞</span> {{ $phone }}
                     </a>
-                    <a href="https://wa.me/22665033700?text=Bonjour, j'ai une question concernant ma commande {{ $order->order_number }}" 
+                    <a href="{{ $waUrl }}?text=Bonjour, j'ai une question concernant ma commande {{ $order->order_number }}"
                        target="_blank"
                        class="inline-flex items-center justify-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg shadow-md transition">
                         <span class="mr-2">💬</span> WhatsApp

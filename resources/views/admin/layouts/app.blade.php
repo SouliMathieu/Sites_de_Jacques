@@ -58,6 +58,10 @@
                         <span class="text-lg mr-3">📋</span>
                         <span class="font-medium">Commandes</span>
                     </a>
+                     <a href="{{ route('admin.settings.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.settings.*') ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md' : '' }}">
+                         <span class="text-lg mr-3">⚙️</span>
+     <span class="font-medium">Paramètres</span>
+ </a>
 
                     {{-- Séparateur visuel --}}
                     <div class="border-t border-gray-200 my-4"></div>
