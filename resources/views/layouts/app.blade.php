@@ -221,7 +221,12 @@
                     </div>
                 </div>
             </div>
-
+            @php $maps = \App\Models\SiteSetting::get('maps_embed', ''); @endphp
+@if($maps)
+    <div class="mt-3 rounded-lg overflow-hidden" style="height:150px;">
+        <iframe src="{{ $maps }}" width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+@endif
             {{-- Copyright --}}
             <div class="border-t border-blue-500 mt-8 pt-6 text-center text-sm text-blue-100">
                 <p>&copy; {{ date('Y') }} Jackson Energy International. Tous droits réservés.</p>
